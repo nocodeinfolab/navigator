@@ -495,10 +495,17 @@
     @media(max-width:700px) {
       .mo-header-inner { flex-direction:column; gap:12px; }
       .mo-user-chip    { width:100%; justify-content:center; }
-      .cv-header-inner { flex-direction:column; align-items:flex-start; }
+      .cv-header-inner { flex-direction:row; align-items:flex-start; }
       .cv-grid-2, .cv-grid-3 { grid-template-columns:1fr 1fr; }
       .cv-tab span { display:none; }
       .mo-review-banner { flex-direction:column; align-items:flex-start; }
+      .mo-header { padding: 16px; }
+      .mo-header-title h1 { font-size: 1rem; }
+      .mo-header-title p  { font-size: 0.72rem; }
+      .mo-logo-box { display: none; }
+      .mo-user-name, .mo-user-role { display: none; }
+      .mo-user-chip { padding: 4px; gap: 0; background: transparent; width: auto; }
+      .mo-header-inner { flex-direction: row; gap: 0; }
     }
     @media(max-width:420px) {
       .cv-grid-2, .cv-grid-3 { grid-template-columns:1fr; }
