@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Navigator Dashboard — POCCH Patient Navigation</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    :root {
+      --nav-primary: #1a73e8;
+      --nav-primary-light: #e8f0fe;
+      --nav-primary-dark: #0d47a1;
+      --nav-green: #34a853;
+      --nav-danger: #d32f2f;
+      --nav-warning: #f9ab00;
+      --nav-purple: #8e24aa;
+      --text: #202124;
+      --text-light: #5f6368;
+      --bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --border: rgba(0,0,0,0.1);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { font-size: 18px; }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(to bottom right, #f8fafc, #eff6ff);
+      min-height: 100vh;
+      color: var(--text);
+      padding: 20px;
+      padding-bottom: 80px;
+    }
+
+    /* ── Header ── */
+    .nd-header {
+      background: linear-gradient(135deg, var(--nav-primary), var(--nav-primary-dark));
+      color: white; padding: 22px 28px;
+      border-radius: 16px; margin-bottom: 24px;
+      position: relative; overflow: visible;
+    }
+    .nd-header::before {
+      content:""; position:absolute; top:-50%; right:-8%;
+      width:300px; height:300px;
+      background:rgba(255,255,255,0.07); border-radius:50%;
+    }
+    .nd-header-inner {
+      position:relative; z-index:1;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .nd-header-left { display:flex; align-items:center; gap:14px; }
+    .nd-back {
+      width:42px; height:42px; border-radius:50%;
+      background:rgba(255,255,255,0.18); border:none; color:white;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      font-size:1rem; transition:background 0.2s;
+    }
+    .nd-back:hover { background:rgba(255,255,255,0.28); }
+    .nd-logo-box {
+      width:48px; height:48px; border-radius:12px;
+      background:rgba(255,255,255,0.18);
+      display:flex; align-items:center; justify-content:center; font-size:1.4rem;
+    }
+    .nd-header-title h1 { font-size:1.4rem; font-weight:700; margin:0 0 3px; }
+    .nd-header-title p  { font-size:0.82rem; opacity:0.88; margin:0; }
+
+    .nd-header-right { display:flex; align-items:center; gap:12px; }
+
+    /* ── Notification bell ── */
+    .nd-notif-wrap { position:relative; }
+    .nd-notif-btn {
+      width:42px; height:42px; border-radius:50%;
+      background:rgba(255,255,255,0.18); border:none; color:white;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      font-size:1.1rem; transition:background 0.2s; position:relative;
+    }
+    .nd-notif-btn:hover { background:rgba(255,255,255,0.28); }
+    .nd-notif-badge {
+      position:absolute; top:-3px; right:-3px;
+      width:18px; height:18px; border-radius:50%;
+      background:var(--nav-danger); color:white;
+      font-size:0.55rem; font-weight:700;
+      display:flex; align-items:center; justify-content:center;
+      border:2px solid var(--nav-primary-dark);
+    }
+
+    /* ── Notification dropdown ── */
+    .nd-notif-dropdown {
+      display:none; position:absolute; top:52px; right:0;
+      width:360px; background:white;
+      border:1px solid var(--border); border-radius:14px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.18);
+      z-index:9000; overflow:hidden;
+    }
+    .nd-notif-dropdown.open { display:block; }
+    .nd-notif-header {
+      padding:14px 18px; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .nd-notif-header-title {
+      font-size:0.85rem; font-weight:700; color:var(--text);
+      display:flex; align-items:center; gap:8px;
+    }
+    .nd-notif-count {
+      background:var(--nav-danger); color:white;
+      font-size:0.68rem; font-weight:700;
+      padding:2px 7px; border-radius:20px;
+    }
+    .nd-notif-clear {
+      font-size:0.75rem; color:var(--nav-primary);
+      background:none; border:none; cursor:pointer; font-weight:600;
+    }
+    .nd-notif-list { max-height:400px; overflow-y:auto; }
+    .nd-notif-item {
+      padding:14px 18px; border-bottom:1px solid rgba(0,0,0,0.06);
+      cursor:pointer; transition:background 0.15s;
+      display:flex; gap:12px; align-items:flex-start;
+    }
+    .nd-notif-item:hover { background:var(--bg); }
+    .nd-notif-item:last-child { border-bottom:none; }
+    .nd-notif-icon {
+      width:38px; height:38px; border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1rem; flex-shrink:0; margin-top:2px;
+    }
+    .nd-notif-icon.gp   { background:#e8f0fe; color:var(--nav-primary); }
+    .nd-notif-icon.self { background:#e8f5e9; color:var(--nav-green); }
+    .nd-notif-icon.emergency { background:#fce8e6; color:var(--nav-danger); }
+    .nd-notif-body { flex:1; }
+    .nd-notif-name { font-size:0.83rem; font-weight:700; color:var(--text); margin-bottom:2px; }
+    .nd-notif-sub  { font-size:0.75rem; color:var(--text-light); line-height:1.4; }
+    .nd-notif-time { font-size:0.7rem; color:var(--text-light); margin-top:4px; }
+    .nd-notif-urgency {
+      font-size:0.68rem; font-weight:700; padding:2px 8px;
+      border-radius:20px; flex-shrink:0; align-self:flex-start; margin-top:3px;
+    }
+    .nd-notif-urgency.emergency { background:#fce8e6; color:#c62828; }
+    .nd-notif-urgency.urgent    { background:#fff3e0; color:#e65100; }
+    .nd-notif-urgency.soon      { background:#e8f5e9; color:#2e7d32; }
+    .nd-notif-urgency.routine   { background:#e8f0fe; color:#1a73e8; }
+    .nd-notif-empty {
+      padding:28px; text-align:center;
+      font-size:0.83rem; color:var(--text-light);
+    }
+
+    .nd-user-chip {
+      display:flex; align-items:center; gap:10px;
+      background:rgba(255,255,255,0.14); padding:8px 16px; border-radius:50px;
+    }
+    .nd-avatar {
+      width:34px; height:34px; border-radius:50%;
+      background:white; display:flex; align-items:center; justify-content:center;
+      color:var(--nav-primary); font-size:0.9rem;
+    }
+    .nd-user-name { font-weight:600; font-size:0.85rem; }
+    .nd-user-role { font-size:0.75rem; opacity:0.82; }
+
+    /* ── Stats ── */
+    .nd-stats {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+      gap:12px; margin-bottom:20px;
+    }
+    .nd-stat { background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:14px 16px; }
+    .nd-stat-label { font-size:11px; color:var(--text-light); margin:0 0 5px; }
+    .nd-stat-value { font-size:22px; font-weight:600; margin:0; color:var(--text); }
+    .nd-stat-value.danger  { color:var(--nav-danger); }
+    .nd-stat-value.success { color:var(--nav-green); }
+    .nd-stat-value.warning { color:var(--nav-warning); }
+
+    /* ── Toolbar ── */
+    .nd-toolbar { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+    .nd-search-box {
+      flex:1; min-width:180px;
+      display:flex; align-items:center; gap:8px;
+      background:var(--card-bg); border:1px solid var(--border);
+      border-radius:8px; padding:9px 12px;
+      font-size:0.85rem; color:var(--text-light);
+    }
+    .nd-filter-tabs { display:flex; gap:6px; flex-wrap:wrap; }
+    .nd-tab {
+      padding:7px 14px; border-radius:20px; font-size:0.8rem;
+      border:1px solid var(--border); background:var(--card-bg);
+      color:var(--text-light); cursor:pointer; font-weight:500; transition:all 0.15s;
+    }
+    .nd-tab.active { background:var(--nav-primary); color:white; border-color:var(--nav-primary); }
+    .nd-tab:hover:not(.active) { border-color:var(--nav-primary); color:var(--nav-primary); }
+    .nd-new-btn {
+      display:flex; align-items:center; gap:6px;
+      background:var(--nav-primary); color:white;
+      border:none; border-radius:8px; padding:9px 16px;
+      font-size:0.82rem; font-weight:600; cursor:pointer; white-space:nowrap;
+      transition:background 0.15s;
+    }
+    .nd-new-btn:hover { background:var(--nav-primary-dark); }
+
+    /* ── Table ── */
+    .nd-table-wrap { background:var(--card-bg); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+    .nd-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+    .nd-table th {
+      text-align:left; padding:12px 14px;
+      font-size:11px; font-weight:600; letter-spacing:0.04em;
+      color:var(--text-light); background:var(--bg);
+      border-bottom:1px solid var(--border); text-transform:uppercase;
+    }
+    .nd-table td {
+      padding:13px 14px; font-size:0.83rem;
+      border-bottom:1px solid rgba(0,0,0,0.06);
+      color:var(--text); vertical-align:middle;
+    }
+    .nd-table tr:last-child td { border-bottom:none; }
+    .nd-table tr:hover td { background:var(--bg); }
+
+    .nd-col-patient { width:20%; }
+    .nd-col-type    { width:14%; }
+    .nd-col-urgency { width:12%; }
+    .nd-col-stage   { width:18%; }
+    .nd-col-status  { width:14%; }
+    .nd-col-updated { width:10%; }
+    .nd-col-action  { width:12%; }
+
+    .nd-patient-name { font-weight:600; font-size:0.85rem; }
+    .nd-patient-ref  { font-size:0.73rem; color:var(--text-light); }
+
+    .nd-urgency { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:0.74rem; font-weight:600; }
+    .nd-urgency.emergency { background:#fce8e6; color:#c62828; }
+    .nd-urgency.urgent    { background:#fff3e0; color:#e65100; }
+    .nd-urgency.soon      { background:#e8f5e9; color:#2e7d32; }
+    .nd-urgency.routine   { background:#e8f0fe; color:#1a73e8; }
+
+    .nd-stage { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:6px; font-size:0.75rem; font-weight:500; }
+    .nd-stage.referral-received { background:#e8f0fe; color:#1565c0; }
+    .nd-stage.mo-review         { background:#f3e5f5; color:#6a1b9a; }
+    .nd-stage.pre-arrival       { background:#fff8e1; color:#f57f17; }
+    .nd-stage.on-site           { background:#e8f5e9; color:#1b5e20; }
+    .nd-stage.treatment         { background:#e0f2f1; color:#004d40; }
+    .nd-stage.loop-closed       { background:#f1f8e9; color:#33691e; }
+    .nd-stage.aftercare         { background:#fce4ec; color:#880e4f; }
+
+    .nd-status { display:inline-flex; align-items:center; gap:5px; font-size:0.78rem; font-weight:500; }
+    .nd-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .nd-dot.new       { background:var(--nav-primary); }
+    .nd-dot.pending   { background:var(--nav-warning); }
+    .nd-dot.confirmed { background:var(--nav-green); }
+    .nd-dot.follow-up { background:var(--nav-purple); }
+    .nd-dot.urgent-s  { background:var(--nav-danger); }
+
+    .nd-flag { display:inline-flex; align-items:center; gap:3px; font-size:0.72rem; color:var(--nav-danger); background:#fce8e6; padding:2px 7px; border-radius:4px; margin-top:3px; }
+
+    .nd-action-btn {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:6px 12px; border-radius:6px;
+      background:var(--nav-primary-light); color:var(--nav-primary);
+      border:none; cursor:pointer; font-size:0.78rem; font-weight:600; transition:all 0.15s;
+    }
+    .nd-action-btn:hover { background:var(--nav-primary); color:white; }
+
+    /* ── New row highlight ── */
+    .nd-table tr.new-case td { animation: highlightRow 3s ease forwards; }
+    @keyframes highlightRow {
+      0%   { background:#e8f5e9; }
+      100% { background:transparent; }
+    }
+
+    /* ══════════ INTAKE MODAL ══════════ */
+    .im-overlay {
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,0.5); z-index:9999;
+      align-items:flex-start; justify-content:center;
+      padding:20px; overflow-y:auto;
+    }
+    .im-overlay.open { display:flex; }
+
+    .im-modal {
+      background:white; border-radius:20px;
+      width:100%; max-width:720px;
+      margin:auto;
+      animation:modalPop 0.2s ease;
+      overflow:hidden;
+    }
+    @keyframes modalPop {
+      from { transform:scale(0.92) translateY(20px); opacity:0; }
+      to   { transform:scale(1) translateY(0); opacity:1; }
+    }
+
+    /* Modal header */
+    .im-modal-header {
+      background:linear-gradient(135deg, var(--nav-primary), var(--nav-primary-dark));
+      color:white; padding:22px 28px;
+      display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
+    }
+    .im-modal-header-left { display:flex; align-items:center; gap:14px; }
+    .im-modal-icon {
+      width:48px; height:48px; border-radius:12px;
+      background:rgba(255,255,255,0.18);
+      display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0;
+    }
+    .im-modal-title h2 { font-size:1.15rem; font-weight:700; margin:0 0 4px; }
+    .im-modal-title p  { font-size:0.8rem; opacity:0.88; margin:0; }
+    .im-close {
+      width:36px; height:36px; border-radius:50%;
+      background:rgba(255,255,255,0.18); border:none; color:white;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      font-size:1rem; transition:background 0.2s; flex-shrink:0;
+    }
+    .im-close:hover { background:rgba(255,255,255,0.3); }
+
+    /* Referral source banner */
+    .im-source-banner {
+      background:var(--bg); border-bottom:1px solid var(--border);
+      padding:12px 28px; display:flex; align-items:center; gap:10px;
+      font-size:0.8rem; color:var(--text-light);
+    }
+    .im-source-badge {
+      display:inline-flex; align-items:center; gap:5px;
+      background:var(--nav-primary-light); color:var(--nav-primary);
+      padding:3px 10px; border-radius:20px;
+      font-size:0.75rem; font-weight:700;
+    }
+    .im-source-badge.self { background:#e8f5e9; color:#2e7d32; }
+
+    /* Modal body */
+    .im-body { padding:24px 28px; max-height:70vh; overflow-y:auto; }
+
+    /* Section */
+    .im-section { margin-bottom:24px; }
+    .im-section-title {
+      font-size:0.75rem; font-weight:700; text-transform:uppercase;
+      letter-spacing:0.06em; color:var(--text-light);
+      margin-bottom:14px; display:flex; align-items:center; gap:8px;
+      padding-bottom:8px; border-bottom:1px solid var(--border);
+    }
+    .im-section-title i { font-size:14px; color:var(--nav-primary); }
+
+    /* Grid */
+    .im-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px 18px; }
+    .im-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px 16px; }
+    .im-full { grid-column:1/-1; }
+
+    /* Field */
+    .im-field { display:flex; flex-direction:column; gap:5px; }
+    .im-label { font-size:0.75rem; font-weight:600; color:var(--text); }
+    .im-label .req  { color:var(--nav-danger); margin-left:2px; }
+    .im-label .pre  { color:var(--nav-primary); font-weight:400; font-size:0.7rem; margin-left:4px; }
+
+    .im-input, .im-select, .im-textarea {
+      width:100%; padding:9px 12px;
+      border:1px solid var(--border); border-radius:8px;
+      font-size:0.82rem; font-family:inherit; color:var(--text);
+      background:var(--bg); outline:none;
+      transition:border-color 0.15s, box-shadow 0.15s;
+    }
+    .im-input:focus, .im-select:focus, .im-textarea:focus {
+      border-color:var(--nav-primary);
+      box-shadow:0 0 0 3px rgba(26,115,232,0.1);
+      background:white;
+    }
+    .im-input.prefilled { background:#fffde7; border-color:rgba(249,171,0,0.4); }
+    .im-textarea { resize:vertical; min-height:80px; line-height:1.5; }
+
+    /* Urgency selector */
+    .im-urgency-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    .im-urgency-opt  { display:none; }
+    .im-urgency-lbl  {
+      display:flex; flex-direction:column; align-items:center; gap:5px;
+      padding:10px 6px; border-radius:8px; border:2px solid var(--border);
+      cursor:pointer; text-align:center; transition:all 0.15s;
+    }
+    .im-urgency-dot  { width:12px; height:12px; border-radius:50%; }
+    .im-urgency-name { font-size:0.72rem; font-weight:700; }
+    .im-urgency-desc { font-size:0.65rem; color:var(--text-light); }
+    .im-u-routine  .im-urgency-dot  { background:#1a73e8; }
+    .im-u-routine  .im-urgency-name { color:#1a73e8; }
+    .im-u-soon     .im-urgency-dot  { background:#34a853; }
+    .im-u-soon     .im-urgency-name { color:#34a853; }
+    .im-u-urgent   .im-urgency-dot  { background:#f9ab00; }
+    .im-u-urgent   .im-urgency-name { color:#e65100; }
+    .im-u-emergency .im-urgency-dot { background:#d32f2f; }
+    .im-u-emergency .im-urgency-name{ color:#d32f2f; }
+    input[value="routine"]:checked   + .im-urgency-lbl { background:#e8f0fe; border-color:#1a73e8; }
+    input[value="soon"]:checked      + .im-urgency-lbl { background:#e8f5e9; border-color:#34a853; }
+    input[value="urgent"]:checked    + .im-urgency-lbl { background:#fff8e1; border-color:#f9ab00; }
+    input[value="emergency"]:checked + .im-urgency-lbl { background:#fce8e6; border-color:#d32f2f; }
+
+    /* Companion toggle */
+    .im-check-row {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px; border:1px solid var(--border);
+      border-radius:8px; cursor:pointer; background:var(--bg);
+    }
+    .im-check-row input[type=checkbox] { width:16px; height:16px; accent-color:var(--nav-primary); }
+    .im-check-label  { font-size:0.82rem; font-weight:500; }
+    .im-check-sub    { font-size:0.72rem; color:var(--text-light); }
+    .im-companion-box { display:none; margin-top:10px; }
+    .im-companion-box.show { display:block; }
+
+    /* Document checklist */
+    .im-doc-list { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+    .im-doc-item {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:var(--bg);
+    }
+    .im-doc-icon { width:32px; height:32px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
+    .im-doc-icon.pdf  { background:#fce8e6; color:var(--nav-danger); }
+    .im-doc-icon.miss { background:#fff3e0; color:var(--nav-warning); }
+    .im-doc-meta { flex:1; }
+    .im-doc-name { font-size:0.8rem; font-weight:600; }
+    .im-doc-info { font-size:0.7rem; color:var(--text-light); }
+    .im-doc-badge {
+      font-size:0.7rem; font-weight:600; padding:2px 8px; border-radius:20px; flex-shrink:0;
+    }
+    .im-doc-badge.ok      { background:#e8f5e9; color:#2e7d32; }
+    .im-doc-badge.missing { background:#fff3e0; color:#e65100; }
+    .im-request-btn {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:4px 10px; border-radius:6px;
+      background:var(--nav-primary-light); color:var(--nav-primary);
+      border:none; cursor:pointer; font-size:0.72rem; font-weight:600; flex-shrink:0;
+    }
+    .im-request-btn:hover { background:var(--nav-primary); color:white; }
+
+    /* Cost confirmation */
+    .im-cost-confirm {
+      background:linear-gradient(135deg, #fff8e1, #fffde7);
+      border:1px solid rgba(249,171,0,0.4);
+      border-radius:10px; padding:14px 16px;
+      display:flex; align-items:flex-start; gap:12px;
+    }
+    .im-cost-confirm input[type=checkbox] { width:18px; height:18px; margin-top:2px; accent-color:var(--nav-green); cursor:pointer; flex-shrink:0; }
+    .im-cost-confirm-text .title { font-size:0.83rem; font-weight:700; margin-bottom:3px; }
+    .im-cost-confirm-text .sub   { font-size:0.75rem; color:var(--text-light); line-height:1.4; }
+
+    /* Prefilled note */
+    .im-prefill-note {
+      display:flex; align-items:center; gap:6px;
+      background:linear-gradient(135deg, #fffde7, #fff8e1);
+      border:1px solid rgba(249,171,0,0.3);
+      border-radius:8px; padding:8px 12px;
+      font-size:0.75rem; color:#795548;
+      margin-bottom:16px;
+    }
+
+    /* Modal footer */
+    .im-footer {
+      padding:16px 28px; border-top:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      background:var(--bg); flex-wrap:wrap;
+    }
+    .im-footer-note { font-size:0.75rem; color:var(--text-light); display:flex; align-items:center; gap:6px; }
+    .im-footer-actions { display:flex; gap:10px; }
+    .im-cancel-btn {
+      padding:10px 18px; border-radius:8px; border:1px solid var(--border);
+      background:white; color:var(--text-light); cursor:pointer; font-size:0.82rem; font-weight:500;
+    }
+    .im-submit-btn {
+      display:flex; align-items:center; gap:7px;
+      padding:10px 22px; border-radius:8px; border:none;
+      background:var(--nav-primary); color:white;
+      font-size:0.85rem; font-weight:700; cursor:pointer; transition:background 0.15s;
+    }
+    .im-submit-btn:hover { background:var(--nav-primary-dark); }
+    .im-submit-btn:disabled { background:#ccc; cursor:not-allowed; }
+
+    /* ── Success toast ── */
+    .nd-toast {
+      position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+      background:#202124; color:white;
+      padding:12px 22px; border-radius:10px;
+      font-size:0.82rem; font-weight:500;
+      display:flex; align-items:center; gap:8px;
+      box-shadow:0 4px 20px rgba(0,0,0,0.2);
+      z-index:99999; opacity:0; pointer-events:none;
+      transition:opacity 0.3s;
+    }
+    .nd-toast.show { opacity:1; }
+    .nd-toast i { color:var(--nav-green); }
+
+    /* ── Logout ── */
+    .nd-logout {
+      position:fixed; bottom:24px; left:24px;
+      background:white; color:var(--nav-danger);
+      padding:11px 20px; border-radius:50px;
+      border:1px solid rgba(211,47,47,0.2);
+      font-weight:600; font-size:0.82rem; cursor:pointer;
+      display:flex; align-items:center; gap:8px;
+      transition:all 0.2s; z-index:100;
+      box-shadow:0 2px 10px rgba(0,0,0,0.1);
+    }
+    .nd-logout:hover { background:var(--nav-danger); color:white; }
+
+    @media(max-width:700px) {
+      .nd-header-inner { flex-direction:column; gap:12px; }
+      .nd-user-chip    { width:100%; justify-content:center; }
+      .nd-col-type, .nd-col-updated { display:none; }
+      .nd-notif-dropdown { width:300px; right:-60px; }
+      .im-grid-2, .im-grid-3 { grid-template-columns:1fr 1fr; }
+      .im-urgency-grid { grid-template-columns:1fr 1fr; }
+      .im-body { max-height:60vh; }
+    }
+    @media(max-width:420px) {
+      .im-grid-2, .im-grid-3 { grid-template-columns:1fr; }
+    }
+    .notification-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ HEADER ══ -->
+  <div class="nd-header">
+    <div class="nd-header-inner">
+      <div class="nd-header-left">
+        <button class="nd-back" onclick="history.back()"><i class="ti ti-arrow-left"></i></button>
+        <div class="nd-logo-box"><i class="ti ti-layout-dashboard"></i></div>
+        <div class="nd-header-title">
+          <h1>Navigator dashboard</h1>
+          <p>All active cases — real-time view</p>
+        </div>
+      </div>
+      <div class="nd-header-right">
+        <!-- Notification bell -->
+        <div class="nd-notif-wrap">
+          <button class="nd-notif-btn" onclick="toggleNotifDropdown()" id="notif-btn">
+            <i class="ti ti-bell"></i>
+            <span class="nd-notif-badge" id="notif-badge">3</span>
+          </button>
+          <div class="nd-notif-dropdown" id="notif-dropdown">
+            <div class="nd-notif-header">
+              <div class="nd-notif-header-title">
+                <i class="ti ti-bell" style="font-size:14px"></i>
+                New referrals
+                <span class="nd-notif-count" id="notif-header-count">3</span>
+              </div>
+              <button class="nd-notif-clear" onclick="clearAllNotifs()">Clear all</button>
+            </div>
+            <div class="nd-notif-list" id="notif-list">
+
+              <div class="nd-notif-item" onclick="openIntake(0)" id="notif-0">
+                <div class="nd-notif-icon emergency"><i class="ti ti-building-clinic"></i></div>
+                <div class="nd-notif-body">
+                  <div class="nd-notif-name">Chiamaka Obi</div>
+                  <div class="nd-notif-sub">GP referral · Dr. Nwosu, UNTH Enugu<br>Ovarian cancer suspected</div>
+                  <div class="nd-notif-time">2 minutes ago</div>
+                </div>
+                <span class="nd-notif-urgency emergency">Emergency</span>
+              </div>
+
+              <div class="nd-notif-item" onclick="openIntake(1)" id="notif-1">
+                <div class="nd-notif-icon gp"><i class="ti ti-building-clinic"></i></div>
+                <div class="nd-notif-body">
+                  <div class="nd-notif-name">Babatunde Lawal</div>
+                  <div class="nd-notif-sub">GP referral · Dr. Adeola, Reddington Hospital<br>Prostate cancer — Stage II</div>
+                  <div class="nd-notif-time">18 minutes ago</div>
+                </div>
+                <span class="nd-notif-urgency urgent">Urgent</span>
+              </div>
+
+              <div class="nd-notif-item" onclick="openIntake(2)" id="notif-2">
+                <div class="nd-notif-icon self"><i class="ti ti-user-heart"></i></div>
+                <div class="nd-notif-body">
+                  <div class="nd-notif-name">Miriam Danjuma</div>
+                  <div class="nd-notif-sub">Self-referral · Chest pain and breathlessness<br>Specialty unknown</div>
+                  <div class="nd-notif-time">1 hour ago</div>
+                </div>
+                <span class="nd-notif-urgency soon">Soon</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="nd-user-chip">
+          <div class="nd-avatar"><i class="ti ti-user"></i></div>
+          <div>
+            <div class="nd-user-name">Amaka O.</div>
+            <div class="nd-user-role">Navigator</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STATS ══ -->
+  <div class="nd-stats">
+    <div class="nd-stat"><p class="nd-stat-label">Active cases</p><p class="nd-stat-value" id="stat-active">48</p></div>
+    <div class="nd-stat"><p class="nd-stat-label">Urgent today</p><p class="nd-stat-value danger">6</p></div>
+    <div class="nd-stat"><p class="nd-stat-label">Confirmed appointments</p><p class="nd-stat-value success">21</p></div>
+    
+    <div class="nd-stat"><p class="nd-stat-label">New referrals</p><p class="nd-stat-value" id="stat-referrals">3</p></div>
+  </div>
+
+  <!-- ══ TOOLBAR ══ -->
+  <div class="nd-toolbar">
+    <div class="nd-search-box"><i class="ti ti-search"></i> Search by name, ref number, or diagnosis…</div>
+    <div class="nd-filter-tabs">
+      <button class="nd-tab active">All</button>
+      <button class="nd-tab">Emergency</button>
+      <button class="nd-tab">Urgent</button>
+      <button class="nd-tab">Pending docs</button>
+      <button class="nd-tab">MO review</button>
+      <button class="nd-tab">Aftercare</button>
+    </div>
+    <button class="nd-new-btn"><i class="ti ti-plus"></i> New referral</button>
+  </div>
+
+  <!-- ══ TABLE ══ -->
+  <div class="nd-table-wrap">
+    <table class="nd-table">
+      <thead>
+        <tr>
+          <th class="nd-col-patient">Patient</th>
+          <th class="nd-col-type">Referral type</th>
+          <th class="nd-col-urgency">Urgency</th>
+          <th class="nd-col-stage">Stage</th>
+          <th class="nd-col-status">Status</th>
+          <th class="nd-col-updated">Updated</th>
+          <th class="nd-col-action">Action</th>
+        </tr>
+      </thead>
+      <tbody id="cases-tbody">
+        <tr>
+          <td><div class="nd-patient-name">Ngozi Eze</div><div class="nd-patient-ref">REF-2026-00041</div></td>
+          <td>GP referral</td>
+          <td><span class="nd-urgency emergency"><i class="ti ti-alert-triangle" style="font-size:12px"></i> Emergency</span></td>
+          <td><span class="nd-stage mo-review"><i class="ti ti-stethoscope" style="font-size:12px"></i> MO review</span></td>
+          <td><div class="nd-status"><span class="nd-dot urgent-s"></span>Escalated</div></td>
+          <td>Today, 8:14 am</td>
+          <td><button class="nd-action-btn" onclick="window.location.href='case-view.html'"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+        </tr>
+        <tr>
+          <td><div class="nd-patient-name">Emeka Okonkwo</div><div class="nd-patient-ref">REF-2026-00038</div><div class="nd-flag"><i class="ti ti-file-x" style="font-size:11px"></i> Missing docs</div></td>
+          <td>GP referral</td>
+          <td><span class="nd-urgency urgent"><i class="ti ti-clock" style="font-size:12px"></i> Urgent</span></td>
+          <td><span class="nd-stage pre-arrival"><i class="ti ti-map-pin" style="font-size:12px"></i> Pre-arrival</span></td>
+          <td><div class="nd-status"><span class="nd-dot pending"></span>Pending docs</div></td>
+          <td>Today, 9:02 am</td>
+          <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+        </tr>
+        <tr>
+          <td><div class="nd-patient-name">Fatima Sule</div><div class="nd-patient-ref">REF-2026-00035</div></td>
+          <td>Self referral</td>
+          <td><span class="nd-urgency soon">Soon</span></td>
+          <td><span class="nd-stage on-site"><i class="ti ti-building-hospital" style="font-size:12px"></i> On-site</span></td>
+          <td><div class="nd-status"><span class="nd-dot confirmed"></span>Confirmed</div></td>
+          <td>Today, 10:30 am</td>
+          <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+        </tr>
+        <tr>
+          <td><div class="nd-patient-name">Chukwudi Nwosu</div><div class="nd-patient-ref">REF-2026-00031</div></td>
+          <td>Hospital referral</td>
+          <td><span class="nd-urgency urgent"><i class="ti ti-clock" style="font-size:12px"></i> Urgent</span></td>
+          <td><span class="nd-stage treatment"><i class="ti ti-pill" style="font-size:12px"></i> Treatment</span></td>
+          <td><div class="nd-status"><span class="nd-dot follow-up"></span>Follow-up due</div></td>
+          <td>Yesterday</td>
+          <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+        </tr>
+        <tr>
+          <td><div class="nd-patient-name">Aisha Bello</div><div class="nd-patient-ref">REF-2026-00029</div></td>
+          <td>Self referral</td>
+          <td><span class="nd-urgency routine">Routine</span></td>
+          <td><span class="nd-stage referral-received"><i class="ti ti-inbox" style="font-size:12px"></i> Referral received</span></td>
+          <td><div class="nd-status"><span class="nd-dot new"></span>New</div></td>
+          <td>Yesterday</td>
+          <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+        </tr>
+        <tr>
+          <td><div class="nd-patient-name">Tunde Adeyemi</div><div class="nd-patient-ref">REF-2026-00024</div><div class="nd-flag"><i class="ti ti-calendar-x" style="font-size:11px"></i> Missed appointment</div></td>
+          <td>GP referral</td>
+          <td><span class="nd-urgency soon">Soon</span></td>
+          <td><span class="nd-stage treatment"><i class="ti ti-pill" style="font-size:12px"></i> Treatment</span></td>
+          <td><div class="nd-status"><span class="nd-dot urgent-s"></span>Urgent follow-up</div></td>
+          <td>2 days ago</td>
+          <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+        </tr>
+        <tr>
+          <td><div class="nd-patient-name">Grace Onyekachi</div><div class="nd-patient-ref">REF-2026-00018</div></td>
+          <td>Hospital referral</td>
+          <td><span class="nd-urgency routine">Routine</span></td>
+          <td><span class="nd-stage aftercare"><i class="ti ti-heart" style="font-size:12px"></i> Aftercare</span></td>
+          <td><div class="nd-status"><span class="nd-dot follow-up"></span>3-month call due</div></td>
+          <td>3 days ago</td>
+          <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+        </tr>
+        <tr>
+          <td><div class="nd-patient-name">Ibrahim Musa</div><div class="nd-patient-ref">REF-2026-00012</div></td>
+          <td>GP referral</td>
+          <td><span class="nd-urgency soon">Soon</span></td>
+          <td><span class="nd-stage loop-closed"><i class="ti ti-circle-check" style="font-size:12px"></i> Loop closed</span></td>
+          <td><div class="nd-status"><span class="nd-dot confirmed"></span>Summary sent</div></td>
+          <td>5 days ago</td>
+          <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════ INTAKE MODAL ══════════ -->
+  <div class="im-overlay" id="intake-overlay" onclick="overlayClick(event)">
+    <div class="im-modal" id="intake-modal">
+
+      <div class="im-modal-header">
+        <div class="im-modal-header-left">
+          <div class="im-modal-icon"><i class="ti ti-clipboard-list"></i></div>
+          <div class="im-modal-title">
+            <h2>Patient intake form</h2>
+            <p>Complete all fields before creating the case in the system</p>
+          </div>
+        </div>
+        <button class="im-close" onclick="closeIntake()"><i class="ti ti-x"></i></button>
+      </div>
+
+      <div class="im-source-banner" id="im-source-banner">
+        <i class="ti ti-info-circle" style="font-size:14px; color:var(--nav-primary)"></i>
+        Referral source:
+        <span class="im-source-badge" id="im-source-badge"><i class="ti ti-building-clinic" style="font-size:12px"></i> GP referral</span>
+        <span style="margin-left:4px;" id="im-source-detail">Dr. Nwosu · UNTH Enugu</span>
+      </div>
+
+      <div class="im-body">
+
+        <div class="im-prefill-note">
+          <i class="ti ti-sparkles" style="font-size:14px; color:#f9ab00"></i>
+          Fields highlighted in yellow were pre-filled from the referral form. Review and complete the rest.
+        </div>
+
+        <!-- 1. Personal information -->
+        <div class="im-section">
+          <div class="im-section-title"><i class="ti ti-user-circle"></i> Personal information</div>
+          <div class="im-grid-3">
+            <div class="im-field im-full">
+              <label class="im-label">Full name <span class="req">*</span></label>
+              <input class="im-input prefilled" id="im-name" type="text" value="Chiamaka Obi" />
+            </div>
+            <div class="im-field">
+              <label class="im-label">Date of birth <span class="req">*</span></label>
+              <input class="im-input" type="date" />
+            </div>
+            <div class="im-field">
+              <label class="im-label">Sex <span class="req">*</span></label>
+              <select class="im-select" id="im-sex">
+                <option value="">Select</option>
+                <option selected>Female</option>
+                <option>Male</option>
+              </select>
+            </div>
+            <div class="im-field">
+              <label class="im-label">Age <span class="req">*</span> <span class="pre">(from referral)</span></label>
+              <input class="im-input prefilled" type="number" value="42" />
+            </div>
+            <div class="im-field">
+              <label class="im-label">Phone / WhatsApp <span class="req">*</span></label>
+              <input class="im-input prefilled" type="tel" id="im-phone" value="+234 803 111 2233" />
+            </div>
+            <div class="im-field">
+              <label class="im-label">Email</label>
+              <input class="im-input" type="email" placeholder="patient@email.com" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Location & travel -->
+        <div class="im-section">
+          <div class="im-section-title"><i class="ti ti-map-pin"></i> Location & travel</div>
+          <div class="im-grid-3">
+            <div class="im-field">
+              <label class="im-label">State <span class="req">*</span></label>
+              <input class="im-input prefilled" type="text" value="Enugu" />
+            </div>
+            <div class="im-field">
+              <label class="im-label">City</label>
+              <input class="im-input" type="text" placeholder="City" />
+            </div>
+            <div class="im-field">
+              <label class="im-label">Country <span class="req">*</span></label>
+              <select class="im-select">
+                <option selected>Nigeria</option>
+                <option>Ghana</option><option>UK</option><option>USA</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+            <label class="im-check-row">
+              <input type="checkbox" id="im-accom" onchange="toggleAccom()" />
+              <div>
+                <div class="im-check-label">Patient needs accommodation</div>
+                <div class="im-check-sub">Travelling from outside Port Harcourt</div>
+              </div>
+            </label>
+            <div class="im-companion-box" id="im-companion-box">
+              <div class="im-field">
+                <label class="im-label">Number of travel companions</label>
+                <input class="im-input" type="number" min="0" max="10" value="0" style="max-width:140px" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Clinical details -->
+        <div class="im-section">
+          <div class="im-section-title"><i class="ti ti-activity"></i> Clinical details</div>
+          <div class="im-grid-2">
+            <div class="im-field">
+              <label class="im-label">Specialty <span class="req">*</span></label>
+              <select class="im-select">
+                <option>Oncology</option><option>Cardiology</option>
+                <option>Radiology</option><option>General surgery</option>
+                <option>Internal medicine</option><option>Other</option>
+              </select>
+            </div>
+            <div class="im-field">
+              <label class="im-label">Referring doctor <span class="pre">(from referral)</span></label>
+              <input class="im-input prefilled" type="text" value="Dr. Nwosu — UNTH Enugu" />
+            </div>
+            <div class="im-field">
+              <label class="im-label">Diagnosis / type of cancer <span class="req">*</span> <span class="pre">(from referral)</span></label>
+              <input class="im-input prefilled" type="text" value="Ovarian cancer — suspected" />
+            </div>
+            <div class="im-field">
+              <label class="im-label">Current medications</label>
+              <input class="im-input" type="text" placeholder="List current medications" />
+            </div>
+          </div>
+          <div style="margin-top:14px;">
+            <label class="im-label" style="display:block; margin-bottom:10px;">Urgency level <span class="req">*</span></label>
+            <div class="im-urgency-grid">
+              <div class="im-u-routine">
+                <input type="radio" name="im-urgency" id="im-u-routine" value="routine" class="im-urgency-opt" />
+                <label for="im-u-routine" class="im-urgency-lbl">
+                  <div class="im-urgency-dot"></div>
+                  <div class="im-urgency-name">Routine</div>
+                  <div class="im-urgency-desc">No immediate risk</div>
+                </label>
+              </div>
+              <div class="im-u-soon">
+                <input type="radio" name="im-urgency" id="im-u-soon" value="soon" class="im-urgency-opt" />
+                <label for="im-u-soon" class="im-urgency-lbl">
+                  <div class="im-urgency-dot"></div>
+                  <div class="im-urgency-name">Soon</div>
+                  <div class="im-urgency-desc">1–2 weeks</div>
+                </label>
+              </div>
+              <div class="im-u-urgent">
+                <input type="radio" name="im-urgency" id="im-u-urgent" value="urgent" class="im-urgency-opt" />
+                <label for="im-u-urgent" class="im-urgency-lbl">
+                  <div class="im-urgency-dot"></div>
+                  <div class="im-urgency-name">Urgent</div>
+                  <div class="im-urgency-desc">48–72 hours</div>
+                </label>
+              </div>
+              <div class="im-u-emergency">
+                <input type="radio" name="im-urgency" id="im-u-emergency" value="emergency" class="im-urgency-opt" checked />
+                <label for="im-u-emergency" class="im-urgency-lbl">
+                  <div class="im-urgency-dot"></div>
+                  <div class="im-urgency-name">Emergency</div>
+                  <div class="im-urgency-desc">Immediate</div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Insurance & billing -->
+        <div class="im-section">
+          <div class="im-section-title"><i class="ti ti-credit-card"></i> Insurance & billing</div>
+          <div class="im-grid-2">
+            <div class="im-field">
+              <label class="im-label">HMO / Insurance provider</label>
+              <input class="im-input" type="text" placeholder="e.g. NHIS — Hygeia" />
+            </div>
+            <div class="im-field">
+              <label class="im-label">Insurance number</label>
+              <input class="im-input" type="text" placeholder="Policy or ID number" />
+            </div>
+          </div>
+          <div style="margin-top:14px;">
+            <div class="im-cost-confirm">
+              <input type="checkbox" id="im-cost-confirm" onchange="checkSubmitReady()" />
+              <div class="im-cost-confirm-text">
+                <div class="title">Cost of treatment has been discussed with the patient</div>
+                <div class="sub">You must confirm that costs have been communicated before this form can be submitted and the case created.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Documents received -->
+      <div class="im-section">
+          <div class="im-section-title">
+              <i class="ti ti-files"></i> Documents received
+          </div>
+
+          <div class="im-doc-list">
+
+              <div class="im-doc-item">
+                  <div class="im-doc-icon pdf">
+                      <i class="ti ti-file-type-pdf"></i>
+                  </div>
+
+                  <div class="im-doc-meta">
+                      <div class="im-doc-name">referral.pdf</div>
+                      <div class="im-doc-info">PDF · 280 KB · Uploaded by Referring Doctor</div>
+
+                      <select class="im-input" style="margin-top:10px;">
+                          <option value="">Identify document type...</option>
+                          <option>Referral Note</option>
+                          <option>Imaging Report</option>
+                          <option>Laboratory Report</option>
+                          <option>Histopathology Report</option>
+                          <option>Cytology Report</option>
+                          <option>Operative Note</option>
+                          <option>Discharge Summary</option>
+                          <option>Treatment Summary</option>
+                          <option>Prescription</option>
+                          <option>Insurance Document</option>
+                          <option>Other</option>
+                      </select>
+                  </div>
+
+                  <button class="im-request-btn">
+                      <i class="ti ti-eye" style="font-size:11px"></i> Preview
+                  </button>
+              </div>
+
+              <div class="im-doc-item">
+                  <div class="im-doc-icon pdf">
+                      <i class="ti ti-file-type-pdf"></i>
+                  </div>
+
+                  <div class="im-doc-meta">
+                      <div class="im-doc-name">IMG_2478.pdf</div>
+                      <div class="im-doc-info">PDF · 1.2 MB · Uploaded by Referring Doctor</div>
+
+                      <select class="im-input" style="margin-top:10px;">
+                          <option value="">Identify document type...</option>
+                          <option>Referral Note</option>
+                          <option>Imaging Report</option>
+                          <option>Laboratory Report</option>
+                          <option>Histopathology Report</option>
+                          <option>Cytology Report</option>
+                          <option>Operative Note</option>
+                          <option>Discharge Summary</option>
+                          <option>Treatment Summary</option>
+                          <option>Prescription</option>
+                          <option>Insurance Document</option>
+                          <option>Other</option>
+                      </select>
+                  </div>
+
+                  <button class="im-request-btn">
+                      <i class="ti ti-eye" style="font-size:11px"></i> Preview
+                  </button>
+              </div>
+
+          </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="im-footer">
+        <div class="im-footer-note">
+          <i class="ti ti-database" style="font-size:14px; color:var(--nav-primary)"></i>
+          Submitting will create a full patient record in the system
+        </div>
+        <div class="im-footer-actions">
+          <button class="im-cancel-btn" onclick="closeIntake()">Cancel</button>
+          <button class="im-submit-btn" id="im-submit-btn" disabled onclick="submitIntake()">
+            <i class="ti ti-circle-check"></i> Create case
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="nd-toast" id="nd-toast">
+    <i class="ti ti-circle-check"></i>
+    <span id="nd-toast-msg">Case created successfully</span>
+  </div>
+
+  <button class="nd-logout"><i class="ti ti-logout"></i> Logout</button>
+
+  <script>
+    // ── Referral data (pre-filled into modal) ──
+    const referrals = [
+      {
+        name: 'Chiamaka Obi', phone: '+234 803 111 2233', sex: 'Female', age: 42,
+        state: 'Enugu', diagnosis: 'Ovarian cancer — suspected',
+        specialty: 'Oncology', urgency: 'emergency',
+        type: 'gp', doctor: 'Dr. Nwosu · UNTH Enugu',
+        time: '2 minutes ago', ref: 'REF-2026-00049'
+      },
+      {
+        name: 'Babatunde Lawal', phone: '+234 807 444 5566', sex: 'Male', age: 58,
+        state: 'Lagos', diagnosis: 'Prostate cancer — Stage II',
+        specialty: 'Oncology', urgency: 'urgent',
+        type: 'gp', doctor: 'Dr. Adeola · Reddington Hospital',
+        time: '18 minutes ago', ref: 'REF-2026-00048'
+      },
+      {
+        name: 'Miriam Danjuma', phone: '+234 805 777 8899', sex: 'Female', age: 35,
+        state: 'Abuja', diagnosis: 'Chest pain and breathlessness',
+        specialty: 'Cardiology', urgency: 'soon',
+        type: 'self', doctor: null,
+        time: '1 hour ago', ref: 'REF-2026-00047'
+      }
+    ];
+
+    let activeReferralIdx = null;
+    let pendingCount = referrals.length;
+    const dismissed = new Set();
+
+    // ── Bell toggle ──
+    function toggleNotifDropdown() {
+      document.getElementById('notif-dropdown').classList.toggle('open');
+    }
+    document.addEventListener('click', e => {
+      const wrap = document.querySelector('.nd-notif-wrap');
+      if (wrap && !wrap.contains(e.target)) {
+        document.getElementById('notif-dropdown').classList.remove('open');
+      }
+    });
+
+    // ── Open intake modal ──
+    function openIntake(idx) {
+      activeReferralIdx = idx;
+      const r = referrals[idx];
+      document.getElementById('notif-dropdown').classList.remove('open');
+
+      // Source banner
+      const badge = document.getElementById('im-source-badge');
+      const detail = document.getElementById('im-source-detail');
+      if (r.type === 'gp') {
+        badge.className = 'im-source-badge';
+        badge.innerHTML = '<i class="ti ti-building-clinic" style="font-size:12px"></i> GP referral';
+        detail.textContent = r.doctor;
+      } else {
+        badge.className = 'im-source-badge self';
+        badge.innerHTML = '<i class="ti ti-user-heart" style="font-size:12px"></i> Self-referral';
+        detail.textContent = 'Submitted by patient';
+      }
+
+      // Pre-fill fields
+      document.getElementById('im-name').value  = r.name;
+      document.getElementById('im-phone').value = r.phone;
+      document.getElementById('im-sex').value   = r.sex;
+
+      // Urgency radio
+      const urgencyRadio = document.getElementById('im-u-' + r.urgency);
+      if (urgencyRadio) urgencyRadio.checked = true;
+
+      // Show doctor field only for GP
+      document.querySelector('[value="' + r.urgency + '"]').checked = true;
+
+      // Reset cost confirm + submit btn
+      document.getElementById('im-cost-confirm').checked = false;
+      document.getElementById('im-submit-btn').disabled = true;
+
+      document.getElementById('intake-overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeIntake() {
+      document.getElementById('intake-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+      activeReferralIdx = null;
+    }
+
+    function overlayClick(e) {
+      if (e.target === document.getElementById('intake-overlay')) closeIntake();
+    }
+
+    function toggleAccom() {
+      const box = document.getElementById('im-companion-box');
+      box.classList.toggle('show', document.getElementById('im-accom').checked);
+    }
+
+    function checkSubmitReady() {
+      const checked = document.getElementById('im-cost-confirm').checked;
+      document.getElementById('im-submit-btn').disabled = !checked;
+    }
+
+    // ── Submit intake → create case ──
+    function submitIntake() {
+      const idx = activeReferralIdx;
+      const r   = referrals[idx];
+
+      // Remove notification item
+      const notifEl = document.getElementById('notif-' + idx);
+      if (notifEl) notifEl.remove();
+      dismissed.add(idx);
+
+      // Update badge count
+      pendingCount = document.querySelectorAll('.nd-notif-item').length;
+      updateBadge();
+
+      // Add new row to top of case table
+      const urgencyMap = {
+        emergency: `<span class="nd-urgency emergency"><i class="ti ti-alert-triangle" style="font-size:12px"></i> Emergency</span>`,
+        urgent:    `<span class="nd-urgency urgent"><i class="ti ti-clock" style="font-size:12px"></i> Urgent</span>`,
+        soon:      `<span class="nd-urgency soon">Soon</span>`,
+        routine:   `<span class="nd-urgency routine">Routine</span>`
+      };
+      const typeLabel = r.type === 'gp' ? 'GP referral' : 'Self-referral';
+      const row = document.createElement('tr');
+      row.className = 'new-case';
+      row.innerHTML = `
+        <td>
+          <div class="nd-patient-name">${r.name}</div>
+          <div class="nd-patient-ref">${r.ref}</div>
+        </td>
+        <td>${typeLabel}</td>
+        <td>${urgencyMap[r.urgency]}</td>
+        <td><span class="nd-stage referral-received"><i class="ti ti-inbox" style="font-size:12px"></i> Referral received</span></td>
+        <td><div class="nd-status"><span class="nd-dot new"></span>New</div></td>
+        <td>Just now</td>
+        <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+      `;
+      const tbody = document.getElementById('cases-tbody');
+      tbody.insertBefore(row, tbody.firstChild);
+
+      // Update active cases stat
+      const statEl = document.getElementById('stat-active');
+      statEl.textContent = parseInt(statEl.textContent) + 1;
+
+      // Update referrals stat
+      const refEl = document.getElementById('stat-referrals');
+      refEl.textContent = Math.max(0, parseInt(refEl.textContent) - 1);
+
+      closeIntake();
+      showToast(`Case created — ${r.name} added to dashboard`);
+
+      // Show empty state if no more notifs
+      if (document.querySelectorAll('.nd-notif-item').length === 0) {
+        document.getElementById('notif-list').innerHTML = `
+          <div class="nd-notif-empty">
+            <i class="ti ti-bell-off" style="font-size:1.5rem; display:block; margin-bottom:8px; opacity:0.4"></i>
+            No pending referrals
+          </div>`;
+      }
+    }
+
+    function clearAllNotifs() {
+      document.getElementById('notif-list').innerHTML = `
+        <div class="nd-notif-empty">
+          <i class="ti ti-bell-off" style="font-size:1.5rem; display:block; margin-bottom:8px; opacity:0.4"></i>
+          No pending referrals
+        </div>`;
+      pendingCount = 0;
+      updateBadge();
+      document.getElementById('notif-dropdown').classList.remove('open');
+    }
+
+    function updateBadge() {
+      const badge  = document.getElementById('notif-badge');
+      const hCount = document.getElementById('notif-header-count');
+      if (pendingCount <= 0) {
+        badge.style.display  = 'none';
+        hCount.style.display = 'none';
+      } else {
+        badge.textContent  = pendingCount;
+        hCount.textContent = pendingCount;
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('nd-toast');
+      document.getElementById('nd-toast-msg').textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    // Filter tabs
+    document.querySelectorAll('.nd-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.nd-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>
