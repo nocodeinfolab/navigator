@@ -519,6 +519,9 @@
       box-shadow:0 2px 10px rgba(0,0,0,0.1);
     }
     .nd-logout:hover { background:var(--nav-danger); color:white; }
+    .nd-table tbody tr {
+        cursor: pointer;
+    }
 
     @media (max-width:700px) {
       .nd-header {
@@ -746,93 +749,126 @@
 
   <!-- ══ TABLE ══ -->
   <div class="nd-table-wrap">
-    <table class="nd-table">
-      <thead>
-        <tr>
-          <th class="nd-col-patient">Patient</th>
-          <th class="nd-col-type">Referral type</th>
-          <th class="nd-col-urgency">Urgency</th>
-          <th class="nd-col-stage">Stage</th>
-          <th class="nd-col-status">Status</th>
-          <th class="nd-col-updated">Updated</th>
-          <th class="nd-col-action">Action</th>
-        </tr>
-      </thead>
-      <tbody id="cases-tbody">
-        <tr>
-          <td><div class="nd-patient-name">Ngozi Eze</div><div class="nd-patient-ref">REF-2026-00041</div></td>
-          <td>GP referral</td>
-          <td><span class="nd-urgency emergency"><i class="ti ti-alert-triangle" style="font-size:12px"></i> Emergency</span></td>
-          <td><span class="nd-stage mo-review"><i class="ti ti-stethoscope" style="font-size:12px"></i> MO review</span></td>
-          <td><div class="nd-status"><span class="nd-dot urgent-s"></span>Escalated</div></td>
-          <td>Today, 8:14 am</td>
-          <td><button class="nd-action-btn" onclick="window.location.href='case-view.html'"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
-        </tr>
-        <tr>
-          <td><div class="nd-patient-name">Emeka Okonkwo</div><div class="nd-patient-ref">REF-2026-00038</div><div class="nd-flag"><i class="ti ti-file-x" style="font-size:11px"></i> Missing docs</div></td>
-          <td>GP referral</td>
-          <td><span class="nd-urgency urgent"><i class="ti ti-clock" style="font-size:12px"></i> Urgent</span></td>
-          <td><span class="nd-stage pre-arrival"><i class="ti ti-map-pin" style="font-size:12px"></i> Pre-arrival</span></td>
-          <td><div class="nd-status"><span class="nd-dot pending"></span>Pending docs</div></td>
-          <td>Today, 9:02 am</td>
-          <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
-        </tr>
-        <tr>
-          <td><div class="nd-patient-name">Fatima Sule</div><div class="nd-patient-ref">REF-2026-00035</div></td>
-          <td>Self referral</td>
-          <td><span class="nd-urgency soon">Soon</span></td>
-          <td><span class="nd-stage on-site"><i class="ti ti-building-hospital" style="font-size:12px"></i> On-site</span></td>
-          <td><div class="nd-status"><span class="nd-dot confirmed"></span>Confirmed</div></td>
-          <td>Today, 10:30 am</td>
-          <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
-        </tr>
-        <tr>
-          <td><div class="nd-patient-name">Chukwudi Nwosu</div><div class="nd-patient-ref">REF-2026-00031</div></td>
-          <td>Hospital referral</td>
-          <td><span class="nd-urgency urgent"><i class="ti ti-clock" style="font-size:12px"></i> Urgent</span></td>
-          <td><span class="nd-stage treatment"><i class="ti ti-pill" style="font-size:12px"></i> Treatment</span></td>
-          <td><div class="nd-status"><span class="nd-dot follow-up"></span>Follow-up due</div></td>
-          <td>Yesterday</td>
-          <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
-        </tr>
-        <tr>
-          <td><div class="nd-patient-name">Aisha Bello</div><div class="nd-patient-ref">REF-2026-00029</div></td>
-          <td>Self referral</td>
-          <td><span class="nd-urgency routine">Routine</span></td>
-          <td><span class="nd-stage referral-received"><i class="ti ti-inbox" style="font-size:12px"></i> Referral received</span></td>
-          <td><div class="nd-status"><span class="nd-dot new"></span>New</div></td>
-          <td>Yesterday</td>
-          <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
-        </tr>
-        <tr>
-          <td><div class="nd-patient-name">Tunde Adeyemi</div><div class="nd-patient-ref">REF-2026-00024</div><div class="nd-flag"><i class="ti ti-calendar-x" style="font-size:11px"></i> Missed appointment</div></td>
-          <td>GP referral</td>
-          <td><span class="nd-urgency soon">Soon</span></td>
-          <td><span class="nd-stage treatment"><i class="ti ti-pill" style="font-size:12px"></i> Treatment</span></td>
-          <td><div class="nd-status"><span class="nd-dot urgent-s"></span>Urgent follow-up</div></td>
-          <td>2 days ago</td>
-          <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
-        </tr>
-        <tr>
-          <td><div class="nd-patient-name">Grace Onyekachi</div><div class="nd-patient-ref">REF-2026-00018</div></td>
-          <td>Hospital referral</td>
-          <td><span class="nd-urgency routine">Routine</span></td>
-          <td><span class="nd-stage aftercare"><i class="ti ti-heart" style="font-size:12px"></i> Aftercare</span></td>
-          <td><div class="nd-status"><span class="nd-dot follow-up"></span>3-month call due</div></td>
-          <td>3 days ago</td>
-          <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
-        </tr>
-        <tr>
-          <td><div class="nd-patient-name">Ibrahim Musa</div><div class="nd-patient-ref">REF-2026-00012</div></td>
-          <td>GP referral</td>
-          <td><span class="nd-urgency soon">Soon</span></td>
-          <td><span class="nd-stage loop-closed"><i class="ti ti-circle-check" style="font-size:12px"></i> Loop closed</span></td>
-          <td><div class="nd-status"><span class="nd-dot confirmed"></span>Summary sent</div></td>
-          <td>5 days ago</td>
-          <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
-        </tr>
-      </tbody>
-    </table>
+      <table class="nd-table">
+          <thead>
+              <tr>
+                  <th class="nd-col-patient">Patient</th>
+                  <th class="nd-col-type">Referral type</th>
+                  <th class="nd-col-urgency">Urgency</th>
+                  <th class="nd-col-stage">Stage</th>
+                  <th class="nd-col-status">Status</th>
+                  <th class="nd-col-updated">Updated</th>
+                  <th class="nd-col-action">Action</th>
+              </tr>
+          </thead>
+          <tbody id="cases-tbody">
+              <tr onclick="window.location.href='case-view.html'">
+                  <td>
+                      <div class="nd-patient-name">Ngozi Eze</div>
+                      <div class="nd-patient-ref">REF-2026-00041</div>
+                  </td>
+                  <td>GP referral</td>
+                  <td><span class="nd-urgency emergency"><i class="ti ti-alert-triangle" style="font-size:12px"></i> Emergency</span></td>
+                  <td><span class="nd-stage mo-review"><i class="ti ti-stethoscope" style="font-size:12px"></i> MO review</span></td>
+                  <td><div class="nd-status"><span class="nd-dot urgent-s"></span>Escalated</div></td>
+                  <td>Today, 8:14 am</td>
+                  <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+              </tr>
+
+              <tr onclick="window.location.href='case-view.html'">
+                  <td>
+                      <div class="nd-patient-name">Emeka Okonkwo</div>
+                      <div class="nd-patient-ref">REF-2026-00038</div>
+                      <div class="nd-flag"><i class="ti ti-file-x" style="font-size:11px"></i> Missing docs</div>
+                  </td>
+                  <td>GP referral</td>
+                  <td><span class="nd-urgency urgent"><i class="ti ti-clock" style="font-size:12px"></i> Urgent</span></td>
+                  <td><span class="nd-stage pre-arrival"><i class="ti ti-map-pin" style="font-size:12px"></i> Pre-arrival</span></td>
+                  <td><div class="nd-status"><span class="nd-dot pending"></span>Pending docs</div></td>
+                  <td>Today, 9:02 am</td>
+                  <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+              </tr>
+
+              <tr onclick="window.location.href='case-view.html'">
+                  <td>
+                      <div class="nd-patient-name">Fatima Sule</div>
+                      <div class="nd-patient-ref">REF-2026-00035</div>
+                  </td>
+                  <td>Self referral</td>
+                  <td><span class="nd-urgency soon">Soon</span></td>
+                  <td><span class="nd-stage on-site"><i class="ti ti-building-hospital" style="font-size:12px"></i> On-site</span></td>
+                  <td><div class="nd-status"><span class="nd-dot confirmed"></span>Confirmed</div></td>
+                  <td>Today, 10:30 am</td>
+                  <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+              </tr>
+
+              <tr onclick="window.location.href='case-view.html'">
+                  <td>
+                      <div class="nd-patient-name">Chukwudi Nwosu</div>
+                      <div class="nd-patient-ref">REF-2026-00031</div>
+                  </td>
+                  <td>Hospital referral</td>
+                  <td><span class="nd-urgency urgent"><i class="ti ti-clock" style="font-size:12px"></i> Urgent</span></td>
+                  <td><span class="nd-stage treatment"><i class="ti ti-pill" style="font-size:12px"></i> Treatment</span></td>
+                  <td><div class="nd-status"><span class="nd-dot follow-up"></span>Follow-up due</div></td>
+                  <td>Yesterday</td>
+                  <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+              </tr>
+
+              <tr onclick="window.location.href='case-view.html'">
+                  <td>
+                      <div class="nd-patient-name">Aisha Bello</div>
+                      <div class="nd-patient-ref">REF-2026-00029</div>
+                  </td>
+                  <td>Self referral</td>
+                  <td><span class="nd-urgency routine">Routine</span></td>
+                  <td><span class="nd-stage referral-received"><i class="ti ti-inbox" style="font-size:12px"></i> Referral received</span></td>
+                  <td><div class="nd-status"><span class="nd-dot new"></span>New</div></td>
+                  <td>Yesterday</td>
+                  <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+              </tr>
+
+              <tr onclick="window.location.href='case-view.html'">
+                  <td>
+                      <div class="nd-patient-name">Tunde Adeyemi</div>
+                      <div class="nd-patient-ref">REF-2026-00024</div>
+                      <div class="nd-flag"><i class="ti ti-calendar-x" style="font-size:11px"></i> Missed appointment</div>
+                  </td>
+                  <td>GP referral</td>
+                  <td><span class="nd-urgency soon">Soon</span></td>
+                  <td><span class="nd-stage treatment"><i class="ti ti-pill" style="font-size:12px"></i> Treatment</span></td>
+                  <td><div class="nd-status"><span class="nd-dot urgent-s"></span>Urgent follow-up</div></td>
+                  <td>2 days ago</td>
+                  <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+              </tr>
+
+              <tr onclick="window.location.href='case-view.html'">
+                  <td>
+                      <div class="nd-patient-name">Grace Onyekachi</div>
+                      <div class="nd-patient-ref">REF-2026-00018</div>
+                  </td>
+                  <td>Hospital referral</td>
+                  <td><span class="nd-urgency routine">Routine</span></td>
+                  <td><span class="nd-stage aftercare"><i class="ti ti-heart" style="font-size:12px"></i> Aftercare</span></td>
+                  <td><div class="nd-status"><span class="nd-dot follow-up"></span>3-month call due</div></td>
+                  <td>3 days ago</td>
+                  <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+              </tr>
+
+              <tr onclick="window.location.href='case-view.html'">
+                  <td>
+                      <div class="nd-patient-name">Ibrahim Musa</div>
+                      <div class="nd-patient-ref">REF-2026-00012</div>
+                  </td>
+                  <td>GP referral</td>
+                  <td><span class="nd-urgency soon">Soon</span></td>
+                  <td><span class="nd-stage loop-closed"><i class="ti ti-circle-check" style="font-size:12px"></i> Loop closed</span></td>
+                  <td><div class="nd-status"><span class="nd-dot confirmed"></span>Summary sent</div></td>
+                  <td>5 days ago</td>
+                  <td><button class="nd-action-btn"><i class="ti ti-eye" style="font-size:13px"></i> View</button></td>
+              </tr>
+          </tbody>
+      </table>
   </div>
 
   <!-- ══════════ INTAKE MODAL ══════════ -->
