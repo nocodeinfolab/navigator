@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Medical Officer — POCCH Patient Navigation</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    :root {
+      --nav-primary: #1a73e8;
+      --nav-primary-light: #e8f0fe;
+      --nav-primary-dark: #0d47a1;
+      --nav-green: #34a853;
+      --nav-danger: #d32f2f;
+      --nav-warning: #f9ab00;
+      --nav-purple: #1a73e8;
+      --text: #202124;
+      --text-light: #5f6368;
+      --bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --border: rgba(0,0,0,0.1);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html {
+      font-size: 18px;
+    }
+
+
+    body {
+      font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(to bottom right, #f8fafc, #eff6ff);
+      min-height: 100vh;
+      color: var(--text);
+      padding: 20px;
+      padding-bottom: 80px;
+    }
+    /* ── Screens ── */
+    .mo-screen { display: none; }
+    .mo-screen.active { display: block; }
+
+    /* ── Header ── */
+    .mo-header {
+      background: linear-gradient(135deg, var(--nav-primary), var(--nav-primary-dark));
+      color: white;
+      padding: 22px 28px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .mo-header::before {
+      content:""; position:absolute; top:-50%; right:-8%;
+      width:300px; height:300px;
+      background:rgba(255,255,255,0.07); border-radius:50%;
+    }
+    .mo-header-inner {
+      position:relative; z-index:1;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .mo-header-left { display:flex; align-items:center; gap:14px; }
+    .mo-back {
+      width:42px; height:42px; border-radius:50%;
+      background:rgba(255,255,255,0.18); border:none; color:white;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      font-size:1rem; transition:background 0.2s;
+    }
+    .mo-back:hover { background:rgba(255,255,255,0.28); }
+    .mo-logo-box {
+      width:48px; height:48px; border-radius:12px;
+      background:rgba(255,255,255,0.18);
+      display:flex; align-items:center; justify-content:center; font-size:1.4rem;
+    }
+    .mo-header-title h1 { font-size:1.4rem; font-weight:700; margin:0 0 3px; }
+    .mo-header-title p  { font-size:0.82rem; opacity:0.88; margin:0; }
+    .mo-user-chip {
+      display:flex; align-items:center; gap:10px;
+      background:rgba(255,255,255,0.14); padding:8px 16px; border-radius:50px;
+    }
+    .mo-avatar {
+      width:34px; height:34px; border-radius:50%;
+      background:white; display:flex; align-items:center; justify-content:center;
+      color:var(--nav-primary); font-size:0.85rem; font-weight:700;
+    }
+    .mo-user-name { font-weight:600; font-size:0.85rem; }
+    .mo-user-role { font-size:0.75rem; opacity:0.82; }
+
+    /* ── Stats ── */
+    .mo-stats {
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(130px,1fr));
+      gap:12px; margin-bottom:20px;
+    }
+    .mo-stat {
+      background:var(--card-bg); border:1px solid var(--border);
+      border-radius:12px; padding:14px 16px;
+    }
+    .mo-stat-label { font-size:11px; color:var(--text-light); margin:0 0 5px; }
+    .mo-stat-value { font-size:22px; font-weight:600; margin:0; color:var(--text); }
+    .mo-stat-value.danger  { color:var(--nav-danger); }
+    .mo-stat-value.success { color:var(--nav-green); }
+    .mo-stat-value.purple  { color:var(--nav-purple); }
+    .mo-stat-value.warning { color:var(--nav-warning); }
+
+    /* ── Toolbar ── */
+    .mo-toolbar {
+      display:flex; align-items:center; gap:10px;
+      margin-bottom:16px; flex-wrap:wrap;
+    }
+    .mo-search-box {
+      flex:1; min-width:180px;
+      display:flex; align-items:center; gap:8px;
+      background:var(--card-bg); border:1px solid var(--border);
+      border-radius:8px; padding:9px 12px;
+      font-size:0.85rem; color:var(--text-light);
+    }
+    .mo-filter-tabs { display:flex; gap:6px; flex-wrap:wrap; }
+    .mo-tab {
+      padding:7px 14px; border-radius:20px; font-size:0.8rem;
+      border:1px solid var(--border); background:var(--card-bg);
+      color:var(--text-light); cursor:pointer; font-weight:500; transition:all 0.15s;
+    }
+    .mo-tab.active { background:var(--nav-primary); color:white; border-color:var(--nav-primary); }
+    .mo-tab:hover:not(.active) { border-color:var(--nav-primary); color:var(--nav-primary); }
+
+    /* ── Table ── */
+    .mo-table-wrap {
+      background:var(--card-bg); border:1px solid var(--border);
+      border-radius:14px; overflow:hidden;
+    }
+    .mo-table { width:100%; border-collapse:collapse; }
+    .mo-table th {
+      text-align:left; padding:12px 16px;
+      font-size:11px; font-weight:600; letter-spacing:0.04em;
+      color:var(--text-light); background:var(--bg);
+      border-bottom:1px solid var(--border); text-transform:uppercase;
+    }
+    .mo-table td {
+      padding:14px 16px; font-size:0.83rem;
+      border-bottom:1px solid rgba(0,0,0,0.06);
+      color:var(--text); vertical-align:middle;
+    }
+    .mo-table tr:last-child td { border-bottom:none; }
+    .mo-table tr:hover td { background:var(--bg); cursor:pointer; }
+
+    .mo-patient-name { font-weight:600; font-size:0.85rem; }
+    .mo-patient-ref  { font-size:0.73rem; color:var(--text-light); }
+
+    .mo-urgency {
+      display:inline-flex; align-items:center; gap:4px;
+      padding:3px 10px; border-radius:20px;
+      font-size:0.74rem; font-weight:600;
+    }
+    .mo-urgency.emergency { background:#fce8e6; color:#c62828; }
+    .mo-urgency.urgent    { background:#fff3e0; color:#e65100; }
+    .mo-urgency.soon      { background:#e8f5e9; color:#2e7d32; }
+    .mo-urgency.routine   { background:#e8f0fe; color:#1a73e8; }
+
+    .mo-review-status {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:5px 12px; border-radius:20px;
+      font-size:0.78rem; font-weight:600;
+    }
+    .mo-review-status.pending  { background:#fff3e0; color:#e65100; }
+    .mo-review-status.done     { background:#e8f5e9; color:#2e7d32; }
+
+    .mo-view-btn {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:6px 12px; border-radius:6px;
+      background:rgba(142,36,170,0.1); color:var(--nav-primary);
+      border:none; cursor:pointer; font-size:0.78rem; font-weight:600;
+      transition:all 0.15s;
+    }
+    .mo-view-btn:hover { background:var(--nav-primary); color:white; }
+
+    /* ══════ CASE DETAIL ══════ */
+
+    /* ── Case header strip ── */
+    .cv-header {
+      background: linear-gradient(135deg, var(--nav-primary), var(--nav-primary-dark));
+      color: white; padding: 22px 28px;
+      border-radius: 16px; margin-bottom: 20px;
+      position: relative; overflow: hidden;
+    }
+    .cv-header::before {
+      content:""; position:absolute; top:-50%; right:-8%;
+      width:300px; height:300px;
+      background:rgba(255,255,255,0.07); border-radius:50%;
+    }
+    .cv-header-inner {
+      position:relative; z-index:1;
+      display:flex; justify-content:space-between; align-items:center; gap:16px;
+    }
+    .cv-header-left { display:flex; align-items:center; gap:14px; }
+    .cv-patient-avatar {
+      width:52px; height:52px; border-radius:50%;
+      background:rgba(255,255,255,0.22);
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.2rem; font-weight:700; flex-shrink:0;
+    }
+    .cv-patient-info h1 { font-size:1.35rem; font-weight:700; margin:0 0 4px; }
+    .cv-patient-meta { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .cv-ref { font-size:0.8rem; opacity:0.85; }
+    .cv-header-right { display:flex; align-items:center; gap:10px; flex-shrink:0; flex-wrap:wrap; }
+
+    .cv-urgency {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:5px 14px; border-radius:20px;
+      font-size:0.78rem; font-weight:700;
+    }
+    .cv-urgency.emergency { background:rgba(211,47,47,0.25); color:#ffcdd2; }
+    .cv-urgency.urgent    { background:rgba(249,171,0,0.25);  color:#ffe082; }
+    .cv-urgency.soon      { background:rgba(52,168,83,0.25);  color:#c8e6c9; }
+    .cv-urgency.routine   { background:rgba(255,255,255,0.2); color:white; }
+
+    .cv-stage-badge {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:5px 14px; border-radius:20px;
+      font-size:0.78rem; font-weight:600;
+      background:rgba(255,255,255,0.18); color:white;
+    }
+
+    /* ── MO review confirm banner ── */
+    .mo-review-banner {
+      background: linear-gradient(135deg, #fff8e1, #fffde7);
+      border: 1px solid rgba(249,171,0,0.4);
+      border-radius:14px; padding:18px 22px;
+      margin-bottom:20px;
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+      flex-wrap:wrap;
+    }
+    .mo-review-banner.done {
+      background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+      border-color: rgba(52,168,83,0.3);
+    }
+    .mo-review-banner-left { display:flex; align-items:center; gap:14px; }
+    .mo-review-banner-icon {
+      width:44px; height:44px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center; font-size:1.2rem;
+      flex-shrink:0;
+    }
+    .mo-review-banner:not(.done) .mo-review-banner-icon { background:#fff3e0; color:var(--nav-warning); }
+    .mo-review-banner.done .mo-review-banner-icon { background:#e8f5e9; color:var(--nav-green); }
+    .mo-review-banner-title { font-size:0.9rem; font-weight:700; margin-bottom:3px; }
+    .mo-review-banner-sub   { font-size:0.8rem; color:var(--text-light); }
+    .mo-confirm-btn {
+      display:flex; align-items:center; gap:8px;
+      background:var(--nav-green); color:white;
+      border:none; border-radius:10px; padding:12px 22px;
+      font-size:0.88rem; font-weight:700; cursor:pointer;
+      transition:background 0.15s; white-space:nowrap;
+    }
+    .mo-confirm-btn:hover { background:#2e7d32; }
+    .mo-confirmed-tag {
+      display:flex; align-items:center; gap:6px;
+      color:var(--nav-green); font-weight:700; font-size:0.88rem;
+    }
+
+    /* ── Journey ── */
+    .cv-journey {
+      background:var(--card-bg); border:1px solid var(--border);
+      border-radius:14px; padding:24px 28px;
+      margin-bottom:20px; overflow-x:auto;
+    }
+    .cv-journey-label {
+      font-size:11px; font-weight:600; text-transform:uppercase;
+      letter-spacing:0.05em; color:var(--text-light); margin-bottom:20px;
+    }
+    .cv-stages { display:flex; align-items:flex-start; min-width:600px; }
+    .cv-stage-step { flex:1; display:flex; flex-direction:column; align-items:center; position:relative; }
+    .cv-stage-step:not(:last-child)::after {
+      content:""; position:absolute; top:18px; left:50%; width:100%;
+      height:2px; background:#e0e0e0; z-index:0;
+    }
+    .cv-stage-step.done:not(:last-child)::after { background:var(--nav-primary); }
+    .cv-stage-dot {
+      width:36px; height:36px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.85rem; border:2px solid #e0e0e0;
+      background:white; color:#bdbdbd;
+      position:relative; z-index:1;
+    }
+    .cv-stage-step.done .cv-stage-dot   { background:var(--nav-primary); border-color:var(--nav-primary); color:white; }
+    .cv-stage-step.active .cv-stage-dot { background:white; border-color:var(--nav-primary); color:var(--nav-primary); box-shadow:0 0 0 4px #f3e5f5; }
+    .cv-stage-name {
+      font-size:0.7rem; font-weight:500; text-align:center;
+      margin-top:8px; color:var(--text-light); line-height:1.3;
+    }
+    .cv-stage-step.done .cv-stage-name,
+    .cv-stage-step.active .cv-stage-name { color:var(--nav-primary); font-weight:600; }
+
+    /* ── Tabs ── */
+
+    .cv-tabs {
+      display:flex; background:var(--card-bg);
+      border:1px solid var(--border); border-radius:12px;
+      overflow:hidden; margin-bottom:20px;
+    }
+    .cv-tab {
+      flex:1; padding:13px 10px; border:none; background:transparent;
+      font-size:0.82rem; font-weight:500; color:var(--text-light); cursor:pointer;
+      border-bottom:2px solid transparent; transition:all 0.15s;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+    }
+    .cv-tab:hover { color:var(--nav-primary); background:var(--bg); }
+    .cv-tab.active { color:var(--nav-primary); border-bottom-color:var(--nav-primary); background:#f9f0ff; font-weight:600; }
+    .cv-tab i { font-size:15px; }
+
+    .cv-panel { display:none; }
+    .cv-panel.active { display:block; }
+    .cv-tabs {
+      display:flex; gap:0;
+      background:var(--card-bg);
+      border:1px solid var(--border);
+      border-radius:12px; overflow:hidden;
+      margin-bottom:20px;
+    }
+    .cv-tab {
+      flex:1; padding:13px 10px;
+      border:none; background:transparent;
+      font-size:0.82rem; font-weight:500;
+      color:var(--text-light); cursor:pointer;
+      border-bottom:2px solid transparent;
+      transition:all 0.15s;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+    }
+    .cv-tab:hover { color:var(--nav-primary); background:var(--bg); }
+    .cv-tab.active {
+      color:var(--nav-primary);
+      border-bottom-color:var(--nav-primary);
+      background:var(--nav-primary-light);
+      font-weight:600;
+    }
+    .cv-tab i { font-size:15px; }
+
+
+    /* ── Card ── */
+    .cv-card {
+      background:var(--card-bg); border:1px solid var(--border);
+      border-radius:14px; padding:22px 24px; margin-bottom:16px;
+    }
+    .cv-card-title {
+      font-size:0.8rem; font-weight:700; text-transform:uppercase;
+      letter-spacing:0.05em; color:var(--text-light);
+      margin-bottom:16px; display:flex; align-items:center; gap:8px;
+    }
+    .cv-card-title i { font-size:15px; color:var(--nav-primary); }
+
+    .cv-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; }
+    .cv-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 20px; }
+
+    .cv-field-label { font-size:11px; color:var(--text-light); margin-bottom:3px; font-weight:500; }
+    .cv-field-value { font-size:0.88rem; font-weight:500; color:var(--text); }
+    .cv-field-value.highlight { color:var(--nav-primary); }
+
+    /* ── Team ── */
+    .cv-team { display:flex; gap:12px; flex-wrap:wrap; }
+    .cv-team-member {
+      display:flex; align-items:center; gap:10px;
+      background:var(--bg); border:1px solid var(--border);
+      border-radius:10px; padding:10px 14px; flex:1; min-width:160px;
+    }
+    .cv-team-avatar {
+      width:36px; height:36px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.85rem; font-weight:700; flex-shrink:0;
+    }
+    .cv-team-avatar.nav-role  { background:var(--nav-primary-light); color:var(--nav-primary); }
+    .cv-team-avatar.mo-role   { background:#f3e5f5; color:var(--nav-primary); }
+    .cv-team-avatar.onc-role  { background:#fce8e6; color:var(--nav-danger); }
+    .cv-team-role { font-size:0.72rem; color:var(--text-light); }
+    .cv-team-name { font-size:0.85rem; font-weight:600; }
+
+    /* ── Documents (read-only) ── */
+    .cv-doc-list { display:flex; flex-direction:column; gap:10px; }
+    .cv-doc-item {
+      display:flex; align-items:center; gap:12px;
+      padding:12px 16px; border-radius:10px;
+      border:1px solid var(--border); background:var(--bg);
+    }
+    .cv-doc-icon {
+      width:38px; height:38px; border-radius:8px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.1rem; flex-shrink:0;
+    }
+    .cv-doc-icon.pdf  { background:#fce8e6; color:var(--nav-danger); }
+    .cv-doc-icon.img  { background:#e8f5e9; color:var(--nav-green); }
+    .cv-doc-icon.miss { background:#fff3e0; color:var(--nav-warning); }
+    .cv-doc-meta { flex:1; }
+    .cv-doc-name { font-size:0.85rem; font-weight:600; }
+    .cv-doc-info { font-size:0.75rem; color:var(--text-light); }
+    .cv-doc-action {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:5px 12px; border-radius:6px;
+      background:var(--nav-primary-light); color:var(--nav-primary);
+      border:none; cursor:pointer; font-size:0.78rem; font-weight:600;
+      flex-shrink:0; transition:all 0.15s;
+    }
+    .cv-doc-action:hover { background:var(--nav-primary); color:white; }
+    .cv-doc-status {
+      font-size:0.75rem; font-weight:600; padding:3px 10px;
+      border-radius:20px; flex-shrink:0;
+    }
+    .cv-doc-status.missing { background:#fff3e0; color:#e65100; }
+
+    .cv-readonly-notice {
+      display:flex; align-items:center; gap:8px;
+      background:#f3e5f5; color:var(--nav-primary);
+      padding:10px 14px; border-radius:8px;
+      font-size:0.8rem; font-weight:500; margin-bottom:16px;
+    }
+
+    /* ── Clinical notes (MO can add) ── */
+    .cv-note {
+      padding:16px; border-radius:10px;
+      border-left:3px solid var(--nav-primary);
+      background:var(--bg); margin-bottom:12px;
+    }
+    .cv-note.oncologist { border-left-color:var(--nav-danger); }
+    .cv-note-header {
+      display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;
+    }
+    .cv-note-author { font-size:0.82rem; font-weight:700; }
+    .cv-note-role   { font-size:0.72rem; color:var(--text-light); margin-left:6px; }
+    .cv-note-time   { font-size:0.75rem; color:var(--text-light); }
+    .cv-note-body   { font-size:0.85rem; line-height:1.6; }
+
+    .mo-add-note-box {
+      border:1px solid var(--border); border-radius:12px;
+      overflow:hidden; margin-top:20px;
+    }
+    .mo-add-note-label {
+      background:var(--bg); padding:12px 16px;
+      font-size:0.8rem; font-weight:700; color:var(--text-light);
+      text-transform:uppercase; letter-spacing:0.05em;
+      display:flex; align-items:center; gap:8px;
+      border-bottom:1px solid var(--border);
+    }
+    .mo-add-note-label i { color:var(--nav-primary); font-size:15px; }
+    .mo-note-textarea {
+      width:100%; padding:14px 16px;
+      border:none; outline:none; resize:vertical;
+      min-height:110px; font-family:inherit; font-size:0.88rem;
+      color:var(--text); background:white; line-height:1.6;
+    }
+    .mo-note-footer {
+      padding:10px 14px; background:var(--bg);
+      border-top:1px solid var(--border);
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .mo-note-hint { font-size:0.77rem; color:var(--text-light); }
+    .mo-note-submit {
+      display:flex; align-items:center; gap:6px;
+      background:var(--nav-primary); color:white;
+      border:none; border-radius:8px; padding:8px 18px;
+      font-size:0.82rem; font-weight:600; cursor:pointer;
+      transition:background 0.15s;
+    }
+    .mo-note-submit:hover { background:#4a148c; }
+
+    /* ── Activity log ── */
+    .cv-activity-list { display:flex; flex-direction:column; }
+    .cv-activity-item { display:flex; gap:14px; padding:14px 0; border-bottom:1px solid rgba(0,0,0,0.06); }
+    .cv-activity-item:last-child { border-bottom:none; }
+    .cv-activity-icon-wrap { display:flex; flex-direction:column; align-items:center; flex-shrink:0; }
+    .cv-activity-dot {
+      width:34px; height:34px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center; font-size:0.9rem;
+    }
+    .cv-activity-dot.whatsapp { background:#e8f5e9; color:var(--nav-green); }
+    .cv-activity-dot.stage    { background:#f3e5f5; color:var(--nav-primary); }
+    .cv-activity-dot.call     { background:var(--nav-primary-light); color:var(--nav-primary); }
+    .cv-activity-dot.doc      { background:#fff3e0; color:var(--nav-warning); }
+    .cv-activity-dot.note     { background:#f3e5f5; color:var(--nav-primary); }
+    .cv-activity-dot.system   { background:var(--bg); color:var(--text-light); }
+    .cv-activity-line { width:2px; flex:1; background:rgba(0,0,0,0.07); margin-top:4px; }
+    .cv-activity-content { flex:1; padding-top:6px; }
+    .cv-activity-text { font-size:0.85rem; line-height:1.5; }
+    .cv-activity-text strong { font-weight:600; }
+    .cv-activity-time { font-size:0.75rem; color:var(--text-light); margin-top:3px; }
+
+    /* ── Logout ── */
+    .mo-logout {
+      position:fixed; bottom:24px; left:24px;
+      background:white; color:var(--nav-danger);
+      padding:11px 20px; border-radius:50px;
+      border:1px solid rgba(211,47,47,0.2);
+      font-weight:600; font-size:0.82rem; cursor:pointer;
+      display:flex; align-items:center; gap:8px;
+      transition:all 0.2s; z-index:100;
+      box-shadow:0 2px 10px rgba(0,0,0,0.1);
+    }
+    .mo-logout:hover { background:var(--nav-danger); color:white; }
+
+    @media(max-width:700px) {
+      .mo-header-inner { flex-direction:column; gap:12px; }
+      .mo-user-chip    { width:100%; justify-content:center; }
+      .cv-header-inner { flex-direction:column; align-items:flex-start; }
+      .cv-grid-2, .cv-grid-3 { grid-template-columns:1fr 1fr; }
+      .cv-tab span { display:none; }
+      .mo-review-banner { flex-direction:column; align-items:flex-start; }
+    }
+    @media(max-width:420px) {
+      .cv-grid-2, .cv-grid-3 { grid-template-columns:1fr; }
+    }
+    .mo-user-chip .nd-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #fff;
+        color: var(--nav-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .mo-user-chip .nd-avatar i {
+        font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════ SCREEN 1: CASE LIST ══════════════ -->
+  <div id="screen-list" class="mo-screen active">
+
+    <div class="mo-header">
+      <div class="mo-header-inner">
+        <div class="mo-header-left">
+          <button class="mo-back" onclick="history.back()">
+            <i class="ti ti-arrow-left"></i>
+          </button>
+          <div class="mo-logo-box"><i class="ti ti-stethoscope"></i></div>
+          <div class="mo-header-title">
+            <h1>Medical officer</h1>
+            <p>Your assigned cases</p>
+          </div>
+        </div>
+        <div class="mo-user-chip">
+          <div class="nd-avatar"><i class="ti ti-user"></i></div>
+          <div>
+            <div class="mo-user-name">Dr. Raphael Eze</div>
+            <div class="mo-user-role">Medical Officer</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mo-stats">
+      <div class="mo-stat">
+        <p class="mo-stat-label">Assigned cases</p>
+        <p class="mo-stat-value">12</p>
+      </div>
+      <div class="mo-stat">
+        <p class="mo-stat-label">Review pending</p>
+        <p class="mo-stat-value warning">5</p>
+      </div>
+      <div class="mo-stat">
+        <p class="mo-stat-label">Review done</p>
+        <p class="mo-stat-value success">7</p>
+      </div>
+      <div class="mo-stat">
+        <p class="mo-stat-label">Emergency</p>
+        <p class="mo-stat-value danger">2</p>
+      </div>
+    </div>
+
+    <div class="mo-toolbar">
+      <div class="mo-search-box">
+        <i class="ti ti-search"></i>
+        Search by patient name or reference…
+      </div>
+      <div class="mo-filter-tabs">
+        <button class="mo-tab active">All</button>
+        <button class="mo-tab">Review pending</button>
+        <button class="mo-tab">Emergency</button>
+        <button class="mo-tab">Review done</button>
+      </div>
+    </div>
+
+    <div class="mo-table-wrap">
+      <table class="mo-table">
+        <thead>
+          <tr>
+            <th style="width:22%">Patient</th>
+            <th style="width:18%">Diagnosis</th>
+            <th style="width:12%">Urgency</th>
+            <th style="width:16%">Stage</th>
+            <th style="width:16%">MO review</th>
+            <th style="width:10%">Updated</th>
+            <th style="width:6%"></th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr onclick="openCase()">
+            <td>
+              <div class="mo-patient-name">Ngozi Eze</div>
+              <div class="mo-patient-ref">REF-2026-00041</div>
+            </td>
+            <td>Breast cancer — Stage II</td>
+            <td><span class="mo-urgency emergency"><i class="ti ti-alert-triangle" style="font-size:11px"></i> Emergency</span></td>
+            <td>MO review</td>
+            <td><span class="mo-review-status pending"><i class="ti ti-clock" style="font-size:12px"></i> Pending</span></td>
+            <td>Today</td>
+            <td><button class="mo-view-btn" onclick="openCase(); event.stopPropagation()"><i class="ti ti-eye" style="font-size:13px"></i></button></td>
+          </tr>
+
+          <tr onclick="openCase()">
+            <td>
+              <div class="mo-patient-name">Emeka Okonkwo</div>
+              <div class="mo-patient-ref">REF-2026-00038</div>
+            </td>
+            <td>Prostate cancer</td>
+            <td><span class="mo-urgency urgent"><i class="ti ti-clock" style="font-size:11px"></i> Urgent</span></td>
+            <td>MO review</td>
+            <td><span class="mo-review-status pending"><i class="ti ti-clock" style="font-size:12px"></i> Pending</span></td>
+            <td>Today</td>
+            <td><button class="mo-view-btn" onclick="openCase(); event.stopPropagation()"><i class="ti ti-eye" style="font-size:13px"></i></button></td>
+          </tr>
+
+          <tr onclick="openCase()">
+            <td>
+              <div class="mo-patient-name">Fatima Sule</div>
+              <div class="mo-patient-ref">REF-2026-00035</div>
+            </td>
+            <td>Coronary artery disease</td>
+            <td><span class="mo-urgency soon">Soon</span></td>
+            <td>Pre-arrival</td>
+            <td><span class="mo-review-status done"><i class="ti ti-circle-check" style="font-size:12px"></i> Done</span></td>
+            <td>Yesterday</td>
+            <td><button class="mo-view-btn" onclick="openCase(); event.stopPropagation()"><i class="ti ti-eye" style="font-size:13px"></i></button></td>
+          </tr>
+
+          <tr onclick="openCase()">
+            <td>
+              <div class="mo-patient-name">Chukwudi Nwosu</div>
+              <div class="mo-patient-ref">REF-2026-00031</div>
+            </td>
+            <td>Lung cancer — Stage III</td>
+            <td><span class="mo-urgency emergency"><i class="ti ti-alert-triangle" style="font-size:11px"></i> Emergency</span></td>
+            <td>Treatment</td>
+            <td><span class="mo-review-status done"><i class="ti ti-circle-check" style="font-size:12px"></i> Done</span></td>
+            <td>2 days ago</td>
+            <td><button class="mo-view-btn" onclick="openCase(); event.stopPropagation()"><i class="ti ti-eye" style="font-size:13px"></i></button></td>
+          </tr>
+
+          <tr onclick="openCase()">
+            <td>
+              <div class="mo-patient-name">Aisha Bello</div>
+              <div class="mo-patient-ref">REF-2026-00029</div>
+            </td>
+            <td>Cervical cancer — Stage I</td>
+            <td><span class="mo-urgency soon">Soon</span></td>
+            <td>MO review</td>
+            <td><span class="mo-review-status pending"><i class="ti ti-clock" style="font-size:12px"></i> Pending</span></td>
+            <td>2 days ago</td>
+            <td><button class="mo-view-btn" onclick="openCase(); event.stopPropagation()"><i class="ti ti-eye" style="font-size:13px"></i></button></td>
+          </tr>
+
+          <tr onclick="openCase()">
+            <td>
+              <div class="mo-patient-name">Grace Onyekachi</div>
+              <div class="mo-patient-ref">REF-2026-00018</div>
+            </td>
+            <td>Hypertensive heart disease</td>
+            <td><span class="mo-urgency routine">Routine</span></td>
+            <td>Aftercare</td>
+            <td><span class="mo-review-status done"><i class="ti ti-circle-check" style="font-size:12px"></i> Done</span></td>
+            <td>5 days ago</td>
+            <td><button class="mo-view-btn" onclick="openCase(); event.stopPropagation()"><i class="ti ti-eye" style="font-size:13px"></i></button></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ══════════════ SCREEN 2: CASE DETAIL ══════════════ -->
+  <div id="screen-case" class="mo-screen">
+
+    <!-- Case header -->
+    <div class="cv-header">
+      <div class="cv-header-inner">
+        <div class="cv-header-left">
+          <button class="mo-back" onclick="closeCase()">
+            <i class="ti ti-arrow-left"></i>
+          </button>
+          <div class="cv-patient-avatar">NE</div>
+          <div class="cv-patient-info">
+            <h1>Ngozi Eze</h1>
+            <div class="cv-patient-meta">
+              <span class="cv-ref">REF-2026-00041</span>
+              <span class="cv-urgency emergency">
+                <i class="ti ti-alert-triangle" style="font-size:13px"></i> Emergency
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="cv-header-right">
+          <span class="cv-stage-badge">
+            <i class="ti ti-stethoscope" style="font-size:13px"></i> MO review
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MO review confirmation banner -->
+    <div class="mo-review-banner" id="review-banner">
+      <div class="mo-review-banner-left">
+        <div class="mo-review-banner-icon">
+          <i class="ti ti-clipboard-check"></i>
+        </div>
+        <div>
+          <div class="mo-review-banner-title">MO review required</div>
+          <div class="mo-review-banner-sub">Review the patient's documents and clinical details, then confirm your review below.</div>
+        </div>
+      </div>
+      <button class="mo-confirm-btn" onclick="confirmReview()">
+        <i class="ti ti-circle-check"></i> Confirm MO review
+      </button>
+    </div>
+
+    <!-- Journey progress -->
+    <div class="cv-journey">
+      <div class="cv-journey-label">Patient journey</div>
+      <div class="cv-stages">
+        <div class="cv-stage-step done">
+          <div class="cv-stage-dot"><i class="ti ti-inbox" style="font-size:14px"></i></div>
+          <div class="cv-stage-name">Referral<br>received</div>
+        </div>
+        <div class="cv-stage-step active">
+          <div class="cv-stage-dot"><i class="ti ti-stethoscope" style="font-size:14px"></i></div>
+          <div class="cv-stage-name">MO<br>review</div>
+        </div>
+        <div class="cv-stage-step">
+          <div class="cv-stage-dot"><i class="ti ti-map-pin" style="font-size:14px"></i></div>
+          <div class="cv-stage-name">Pre-<br>arrival</div>
+        </div>
+        <div class="cv-stage-step">
+          <div class="cv-stage-dot"><i class="ti ti-building-hospital" style="font-size:14px"></i></div>
+          <div class="cv-stage-name">On-<br>site</div>
+        </div>
+        <div class="cv-stage-step">
+          <div class="cv-stage-dot"><i class="ti ti-pill" style="font-size:14px"></i></div>
+          <div class="cv-stage-name">Treat-<br>ment</div>
+        </div>
+        <div class="cv-stage-step">
+          <div class="cv-stage-dot"><i class="ti ti-circle-check" style="font-size:14px"></i></div>
+          <div class="cv-stage-name">Loop<br>closed</div>
+        </div>
+        <div class="cv-stage-step">
+          <div class="cv-stage-dot"><i class="ti ti-heart" style="font-size:14px"></i></div>
+          <div class="cv-stage-name">After-<br>care</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="cv-tabs">
+      <button class="cv-tab active" onclick="switchTab('overview', this)">
+        <i class="ti ti-user"></i> <span>Overview</span>
+      </button>
+      <button class="cv-tab" onclick="switchTab('documents', this)">
+        <i class="ti ti-files"></i> <span>Documents</span>
+      </button>
+      <button class="cv-tab" onclick="switchTab('notes', this)">
+        <i class="ti ti-notes"></i> <span>Clinical notes</span>
+      </button>
+      <button class="cv-tab" onclick="switchTab('activity', this)">
+        <i class="ti ti-history"></i> <span>Activity</span>
+      </button>
+    </div>
+
+    <!-- TAB: OVERVIEW -->
+    <div id="tab-overview" class="cv-panel active">
+
+      <div class="cv-card">
+        <div class="cv-card-title"><i class="ti ti-users"></i> Assigned team</div>
+        <div class="cv-team">
+          <div class="cv-team-member">
+            <div class="cv-team-avatar nav-role">AO</div>
+            <div><div class="cv-team-role">Navigator</div><div class="cv-team-name">Amaka Obi</div></div>
+          </div>
+          <div class="cv-team-member">
+            <div class="cv-team-avatar mo-role">RE</div>
+            <div><div class="cv-team-role">Medical Officer (you)</div><div class="cv-team-name">Dr. Raphael Eze</div></div>
+          </div>
+          <div class="cv-team-member">
+            <div class="cv-team-avatar onc-role">DA</div>
+            <div><div class="cv-team-role">Oncologist</div><div class="cv-team-name">Dr. Ada Chukwu</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cv-card">
+        <div class="cv-card-title"><i class="ti ti-user-circle"></i> Patient details</div>
+        <div class="cv-grid-3">
+          <div><div class="cv-field-label">Full name</div><div class="cv-field-value">Ngozi Eze</div></div>
+          <div><div class="cv-field-label">Date of birth</div><div class="cv-field-value">14 Mar 1978 (48 yrs)</div></div>
+          <div><div class="cv-field-label">Sex</div><div class="cv-field-value">Female</div></div>
+          <div><div class="cv-field-label">Phone / WhatsApp</div><div class="cv-field-value highlight">+234 803 456 7890</div></div>
+          <div><div class="cv-field-label">Location</div><div class="cv-field-value">Enugu, Nigeria</div></div>
+          <div><div class="cv-field-label">Accommodation needed</div><div class="cv-field-value">Yes — 2 companions</div></div>
+        </div>
+      </div>
+
+      <div class="cv-card">
+        <div class="cv-card-title"><i class="ti ti-building-clinic"></i> Referring doctor</div>
+        <div class="cv-grid-3">
+          <div><div class="cv-field-label">Doctor name</div><div class="cv-field-value">Dr. Emeka Okafor</div></div>
+          <div><div class="cv-field-label">Hospital / clinic</div><div class="cv-field-value">St. Theresa's Hospital, Enugu</div></div>
+          <div><div class="cv-field-label">Phone</div><div class="cv-field-value highlight">+234 803 987 6543</div></div>
+          <div><div class="cv-field-label">Referral date</div><div class="cv-field-value">27 Jun 2026</div></div>
+          <div><div class="cv-field-label">Specialty requested</div><div class="cv-field-value">Oncology</div></div>
+        </div>
+      </div>
+
+      <div class="cv-card">
+        <div class="cv-card-title"><i class="ti ti-activity"></i> Clinical summary</div>
+        <div class="cv-grid-3">
+          <div><div class="cv-field-label">Diagnosis</div><div class="cv-field-value">Breast cancer — Stage II</div></div>
+          <div><div class="cv-field-label">Specialty</div><div class="cv-field-value">Oncology</div></div>
+          <div><div class="cv-field-label">Urgency</div><div class="cv-field-value" style="color:var(--nav-danger);font-weight:700">Emergency</div></div>
+          <div><div class="cv-field-label">Current medications</div><div class="cv-field-value">Tamoxifen 20mg daily, Ibuprofen PRN</div></div>
+          <div style="grid-column:1/-1">
+            <div class="cv-field-label">Doctor's notes</div>
+            <div class="cv-field-value" style="line-height:1.6">Patient presents with a rapidly growing lump in the left breast with axillary lymphadenopathy. Needs urgent oncology review. Biopsy results attached.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB: DOCUMENTS (read-only for MO, but can view/download) -->
+    <div id="tab-documents" class="cv-panel">
+      <div class="cv-card">
+        <div class="cv-readonly-notice">
+          <i class="ti ti-info-circle" style="font-size:16px"></i>
+          Documents are uploaded by the navigator. You can view and download them here.
+        </div>
+        <div class="cv-card-title"><i class="ti ti-files"></i> Patient documents</div>
+        <div class="cv-doc-list">
+          <div class="cv-doc-item">
+            <div class="cv-doc-icon pdf"><i class="ti ti-file-type-pdf"></i></div>
+            <div class="cv-doc-meta">
+              <div class="cv-doc-name">Referral letter — Dr. Okafor</div>
+              <div class="cv-doc-info">PDF · 340 KB · Uploaded 27 Jun 2026</div>
+            </div>
+            <button class="cv-doc-action"><i class="ti ti-download" style="font-size:13px"></i> View</button>
+          </div>
+          <div class="cv-doc-item">
+            <div class="cv-doc-icon pdf"><i class="ti ti-file-type-pdf"></i></div>
+            <div class="cv-doc-meta">
+              <div class="cv-doc-name">Biopsy result</div>
+              <div class="cv-doc-info">PDF · 1.2 MB · Uploaded 27 Jun 2026</div>
+            </div>
+            <button class="cv-doc-action"><i class="ti ti-download" style="font-size:13px"></i> View</button>
+          </div>
+          <div class="cv-doc-item">
+            <div class="cv-doc-icon img"><i class="ti ti-photo"></i></div>
+            <div class="cv-doc-meta">
+              <div class="cv-doc-name">Mammogram — left breast</div>
+              <div class="cv-doc-info">JPEG · 2.8 MB · Uploaded 27 Jun 2026</div>
+            </div>
+            <button class="cv-doc-action"><i class="ti ti-download" style="font-size:13px"></i> View</button>
+          </div>
+          <div class="cv-doc-item">
+            <div class="cv-doc-icon miss"><i class="ti ti-file-unknown"></i></div>
+            <div class="cv-doc-meta">
+              <div class="cv-doc-name">Ultrasound report</div>
+              <div class="cv-doc-info">Not yet received</div>
+            </div>
+            <span class="cv-doc-status missing">Missing</span>
+          </div>
+          <div class="cv-doc-item">
+            <div class="cv-doc-icon miss"><i class="ti ti-file-unknown"></i></div>
+            <div class="cv-doc-meta">
+              <div class="cv-doc-name">Full blood count result</div>
+              <div class="cv-doc-info">Requested — 27 Jun 2026</div>
+            </div>
+            <span class="cv-doc-status missing" style="background:var(--nav-primary-light); color:var(--nav-primary)">Requested</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: CLINICAL NOTES (MO can add) -->
+    <div id="tab-notes" class="cv-panel">
+      <div class="cv-card">
+        <div class="cv-card-title"><i class="ti ti-notes"></i> Clinical notes</div>
+
+        <div class="cv-note">
+          <div class="cv-note-header">
+            <div>
+              <span class="cv-note-author">Dr. Raphael Eze</span>
+              <span class="cv-note-role">Medical Officer</span>
+            </div>
+            <span class="cv-note-time">27 Jun 2026, 10:05 am</span>
+          </div>
+          <div class="cv-note-body">
+            Reviewed biopsy and mammogram. Findings consistent with invasive ductal carcinoma. Requesting full blood count and ultrasound before confirming readiness. MO review pending receipt of outstanding documents.
+          </div>
+        </div>
+
+        <div class="cv-note oncologist">
+          <div class="cv-note-header">
+            <div>
+              <span class="cv-note-author">Dr. Ada Chukwu</span>
+              <span class="cv-note-role">Oncologist</span>
+            </div>
+            <span class="cv-note-time">27 Jun 2026, 11:30 am</span>
+          </div>
+          <div class="cv-note-body">
+            Priority case. Once FBC and ultrasound are received, I can confirm the treatment plan. Navigator please ensure family contact is looped in on pre-arrival communication.
+          </div>
+        </div>
+
+        <!-- Add note box -->
+        <div class="mo-add-note-box">
+          <div class="mo-add-note-label">
+            <i class="ti ti-pencil"></i> Add a clinical note
+          </div>
+          <textarea class="mo-note-textarea" placeholder="Write your clinical observations, recommendations, or review notes…" id="note-input"></textarea>
+          <div class="mo-note-footer">
+            <span class="mo-note-hint">This note will be visible to the navigator and oncologist.</span>
+            <button class="mo-note-submit" onclick="submitNote()">
+              <i class="ti ti-send"></i> Save note
+            </button>
+          </div>
+        </div>
+
+        <!-- New notes appear here -->
+        <div id="new-notes"></div>
+      </div>
+    </div>
+
+    <!-- TAB: ACTIVITY LOG -->
+    <div id="tab-activity" class="cv-panel">
+      <div class="cv-card">
+        <div class="cv-card-title"><i class="ti ti-history"></i> Activity log</div>
+        <div class="cv-activity-list" id="activity-list">
+
+          <div class="cv-activity-item">
+            <div class="cv-activity-icon-wrap">
+              <div class="cv-activity-dot note"><i class="ti ti-notes"></i></div>
+              <div class="cv-activity-line"></div>
+            </div>
+            <div class="cv-activity-content">
+              <div class="cv-activity-text"><strong>Clinical note added</strong> by Dr. Raphael Eze (MO)</div>
+              <div class="cv-activity-time">Today, 10:05 am</div>
+            </div>
+          </div>
+
+          <div class="cv-activity-item">
+            <div class="cv-activity-icon-wrap">
+              <div class="cv-activity-dot doc"><i class="ti ti-file-text"></i></div>
+              <div class="cv-activity-line"></div>
+            </div>
+            <div class="cv-activity-content">
+              <div class="cv-activity-text"><strong>Documents requested</strong> — Full blood count and ultrasound report requested from referring doctor via WhatsApp</div>
+              <div class="cv-activity-time">Today, 9:00 am · Amaka O. (Navigator)</div>
+            </div>
+          </div>
+
+          <div class="cv-activity-item">
+            <div class="cv-activity-icon-wrap">
+              <div class="cv-activity-dot stage"><i class="ti ti-arrow-right"></i></div>
+              <div class="cv-activity-line"></div>
+            </div>
+            <div class="cv-activity-content">
+              <div class="cv-activity-text"><strong>Stage updated</strong> — Referral received → MO review</div>
+              <div class="cv-activity-time">Today, 8:14 am · Amaka O. (Navigator)</div>
+            </div>
+          </div>
+
+          <div class="cv-activity-item">
+            <div class="cv-activity-icon-wrap">
+              <div class="cv-activity-dot whatsapp"><i class="ti ti-brand-whatsapp"></i></div>
+              <div class="cv-activity-line"></div>
+            </div>
+            <div class="cv-activity-content">
+              <div class="cv-activity-text"><strong>WhatsApp sent to patient</strong> — Referral received confirmation sent</div>
+              <div class="cv-activity-time">Today, 8:16 am · Amaka O. (Navigator)</div>
+            </div>
+          </div>
+
+          <div class="cv-activity-item">
+            <div class="cv-activity-icon-wrap">
+              <div class="cv-activity-dot system"><i class="ti ti-inbox"></i></div>
+            </div>
+            <div class="cv-activity-content">
+              <div class="cv-activity-text"><strong>Referral received</strong> — Submitted via GP referral portal by Dr. Emeka Okafor</div>
+              <div class="cv-activity-time">Today, 8:10 am · System</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Logout -->
+  <button class="mo-logout">
+    <i class="ti ti-logout"></i> Logout
+  </button>
+
+  <script>
+    function openCase() {
+      document.getElementById('screen-list').classList.remove('active');
+      document.getElementById('screen-case').classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeCase() {
+      document.getElementById('screen-case').classList.remove('active');
+      document.getElementById('screen-list').classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchTab(name, btn) {
+      document.querySelectorAll('.cv-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.cv-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    function confirmReview() {
+      const banner = document.getElementById('review-banner');
+      banner.classList.add('done');
+      banner.innerHTML = `
+        <div class="mo-review-banner-left">
+          <div class="mo-review-banner-icon"><i class="ti ti-circle-check"></i></div>
+          <div>
+            <div class="mo-review-banner-title">MO review confirmed</div>
+            <div class="mo-review-banner-sub">Confirmed by Dr. Raphael Eze · ${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} · The navigator has been notified.</div>
+          </div>
+        </div>
+        <div class="mo-confirmed-tag"><i class="ti ti-circle-check"></i> Confirmed</div>
+      `;
+
+      // Add to activity log
+      const log = document.getElementById('activity-list');
+      const entry = document.createElement('div');
+      entry.className = 'cv-activity-item';
+      entry.innerHTML = `
+        <div class="cv-activity-icon-wrap">
+          <div class="cv-activity-dot note"><i class="ti ti-clipboard-check"></i></div>
+          <div class="cv-activity-line"></div>
+        </div>
+        <div class="cv-activity-content">
+          <div class="cv-activity-text"><strong>MO review confirmed</strong> by Dr. Raphael Eze</div>
+          <div class="cv-activity-time">Just now</div>
+        </div>
+      `;
+      log.prepend(entry);
+    }
+
+    function submitNote() {
+      const input = document.getElementById('note-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const noteEl = document.createElement('div');
+      noteEl.className = 'cv-note';
+      noteEl.style.marginTop = '16px';
+      noteEl.innerHTML = `
+        <div class="cv-note-header">
+          <div>
+            <span class="cv-note-author">Dr. Raphael Eze</span>
+            <span class="cv-note-role">Medical Officer</span>
+          </div>
+          <span class="cv-note-time">Today, ${now}</span>
+        </div>
+        <div class="cv-note-body">${text}</div>
+      `;
+      document.getElementById('new-notes').prepend(noteEl);
+      input.value = '';
+
+      // Log in activity
+      const log = document.getElementById('activity-list');
+      const entry = document.createElement('div');
+      entry.className = 'cv-activity-item';
+      entry.innerHTML = `
+        <div class="cv-activity-icon-wrap">
+          <div class="cv-activity-dot note"><i class="ti ti-notes"></i></div>
+          <div class="cv-activity-line"></div>
+        </div>
+        <div class="cv-activity-content">
+          <div class="cv-activity-text"><strong>Clinical note added</strong> by Dr. Raphael Eze (MO)</div>
+          <div class="cv-activity-time">Just now</div>
+        </div>
+      `;
+      log.prepend(entry);
+    }
+
+    // Filter tabs (visual only for mockup)
+    document.querySelectorAll('.mo-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.mo-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>
