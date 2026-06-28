@@ -497,8 +497,13 @@
     .oc-logout:hover { background:var(--nav-danger); color:white; }
 
     @media(max-width:700px) {
-      .oc-header-inner { flex-direction:column; gap:12px; }
-      .oc-user-chip    { width:100%; justify-content:center; }
+      .oc-header-inner { flex-direction:row; gap:0; }
+      .oc-header { padding: 16px; }
+      .oc-header-title h1 { font-size: 1rem; }
+      .oc-header-title p  { font-size: 0.72rem; }
+      .oc-logo-box { display: none; }
+      .oc-user-name, .oc-user-role { display: none; }
+      .oc-user-chip { padding: 4px; gap: 0; background: transparent; width: auto; justify-content: unset; }
       .cv-header-inner { flex-direction:column; align-items:flex-start; }
       .cv-grid-2, .cv-grid-3 { grid-template-columns:1fr 1fr; }
       .cv-tab span { display:none; }
@@ -697,14 +702,12 @@
           <button class="oc-back" onclick="closeCase()">
             <i class="ti ti-arrow-left"></i>
           </button>
-          <div class="cv-patient-avatar">NE</div>
+          
           <div class="cv-patient-info">
             <h1>Ngozi Eze</h1>
             <div class="cv-patient-meta">
               <span class="cv-ref">REF-2026-00041</span>
-              <span class="cv-urgency emergency">
-                <i class="ti ti-alert-triangle" style="font-size:13px"></i> Emergency
-              </span>
+              
             </div>
           </div>
         </div>
