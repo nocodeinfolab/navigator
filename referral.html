@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Patient Referral — POCCH Patient Navigation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+    <style>
+        /* ── reset & base ── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+          font-size: 18px;
+        }
+
+        :root {
+            --nav-primary: #1a73e8;
+            --nav-primary-light: #e8f0fe;
+            --nav-primary-dark: #0d47a1;
+            --nav-green: #34a853;
+            --nav-danger: #d32f2f;
+            --nav-warning: #f9ab00;
+            --text: #202124;
+            --text-light: #5f6368;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --border: rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(to bottom right, #f8fafc, #eff6ff);
+            min-height: 100vh;
+            color: var(--text);
+            padding: 16px;
+            padding-bottom: 60px;
+        }
+
+        .rf-container {
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        /* ── Header (compact) ── */
+        .rf-header {
+            background: linear-gradient(135deg, var(--nav-primary), var(--nav-primary-dark));
+            color: white;
+            padding: 16px 28px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        .rf-header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -8%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 50%;
+        }
+        .rf-header::after {
+            content: "";
+            position: absolute;
+            bottom: -40%;
+            left: -4%;
+            width: 160px;
+            height: 160px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 50%;
+        }
+        .rf-header-inner {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .rf-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        .rf-header-text {
+            text-align: left;
+        }
+        .rf-header-text h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .rf-header-text p {
+            font-size: 0.78rem;
+            opacity: 0.88;
+            margin-top: 2px;
+        }
+
+        /* ── Referral type toggle (compact) ── */
+        .rf-type-toggle {
+            display: flex;
+            gap: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        .rf-type-btn {
+            flex: 1;
+            padding: 12px 14px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-right: 1px solid var(--border);
+            justify-content: center;
+        }
+        .rf-type-btn:last-child {
+            border-right: none;
+        }
+        .rf-type-btn.active {
+            background: var(--nav-primary);
+            color: white;
+        }
+        .rf-type-btn:not(.active):hover {
+            background: var(--bg);
+        }
+        .rf-type-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .rf-type-btn:not(.active) .rf-type-icon {
+            background: var(--nav-primary-light);
+            color: var(--nav-primary);
+        }
+        .rf-type-btn.active .rf-type-icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .rf-type-label-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1px;
+        }
+        .rf-type-label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: inherit;
+            line-height: 1.2;
+        }
+        .rf-type-sub {
+            font-size: 0.65rem;
+            opacity: 0.75;
+            color: inherit;
+            line-height: 1.2;
+        }
+        .rf-type-btn:not(.active) .rf-type-label {
+            color: var(--text);
+        }
+        .rf-type-btn:not(.active) .rf-type-sub {
+            color: var(--text-light);
+        }
+
+        /* ── Form wrapper ── */
+        .rf-form {
+            display: none;
+        }
+        .rf-form.active {
+            display: block;
+        }
+
+        /* ── Section card ── */
+        .rf-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 18px;
+        }
+        .rf-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-light);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .rf-section-title i {
+            font-size: 15px;
+            color: var(--nav-primary);
+        }
+
+        /* ── Field ── */
+        .rf-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 18px;
+        }
+        .rf-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px 18px;
+        }
+
+        .rf-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .rf-field.full {
+            grid-column: 1/-1;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        label .rf-required {
+            color: var(--nav-danger);
+            margin-left: 2px;
+        }
+        label .rf-optional {
+            color: var(--text-light);
+            font-weight: 400;
+            font-size: 0.7rem;
+            margin-left: 4px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            color: var(--text);
+            background: var(--bg);
+            transition: border-color 0.15s, box-shadow 0.15s;
+            outline: none;
+        }
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--nav-primary);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.12);
+            background: white;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            line-height: 1.5;
+        }
+        select {
+            cursor: pointer;
+        }
+
+        /* ── Urgency selector ── */
+        .rf-urgency-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .rf-urgency-opt {
+            display: none;
+        }
+        .rf-urgency-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 6px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+        .rf-urgency-label:hover {
+            border-color: currentColor;
+        }
+        .rf-urgency-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .rf-urgency-name {
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .rf-urgency-desc {
+            font-size: 0.65rem;
+            color: var(--text-light);
+            line-height: 1.2;
+        }
+
+        .rf-urgency-opt:checked+.rf-urgency-label {
+            border-width: 2px;
+        }
+
+        /* Routine */
+        .rf-u-routine .rf-urgency-dot {
+            background: #1a73e8;
+        }
+        .rf-u-routine .rf-urgency-name {
+            color: #1a73e8;
+        }
+        input[value="routine"]:checked+.rf-urgency-label {
+            background: #e8f0fe;
+            border-color: #1a73e8;
+        }
+
+        /* Soon */
+        .rf-u-soon .rf-urgency-dot {
+            background: #34a853;
+        }
+        .rf-u-soon .rf-urgency-name {
+            color: #34a853;
+        }
+        input[value="soon"]:checked+.rf-urgency-label {
+            background: #e8f5e9;
+            border-color: #34a853;
+        }
+
+        /* Urgent */
+        .rf-u-urgent .rf-urgency-dot {
+            background: #f9ab00;
+        }
+        .rf-u-urgent .rf-urgency-name {
+            color: #e65100;
+        }
+        input[value="urgent"]:checked+.rf-urgency-label {
+            background: #fff8e1;
+            border-color: #f9ab00;
+        }
+
+        /* Emergency */
+        .rf-u-emergency .rf-urgency-dot {
+            background: #d32f2f;
+        }
+        .rf-u-emergency .rf-urgency-name {
+            color: #d32f2f;
+        }
+        input[value="emergency"]:checked+.rf-urgency-label {
+            background: #fce8e6;
+            border-color: #d32f2f;
+        }
+
+        .rf-emergency-notice {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: #fce8e6;
+            color: #c62828;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 10px;
+            border: 1px solid rgba(211, 47, 47, 0.2);
+        }
+        .rf-emergency-notice.show {
+            display: flex;
+        }
+
+        /* ── Checkbox row ── */
+        .rf-check-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            background: var(--bg);
+            transition: border-color 0.15s;
+        }
+        .rf-check-row:hover {
+            border-color: var(--nav-primary);
+        }
+        .rf-check-row input[type="checkbox"] {
+            width: 17px;
+            height: 17px;
+            cursor: pointer;
+            accent-color: var(--nav-primary);
+            flex-shrink: 0;
+        }
+        .rf-check-label {
+            font-size: 0.83rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+        .rf-check-sub {
+            font-size: 0.72rem;
+            color: var(--text-light);
+            margin-top: 1px;
+        }
+
+        /* ── Companions count ── */
+        .rf-companions {
+            display: none;
+            margin-top: 10px;
+        }
+        .rf-companions.show {
+            display: block;
+        }
+
+        /* ── Document upload ── */
+        .rf-upload-zone {
+            border: 2px dashed rgba(26, 115, 232, 0.3);
+            border-radius: 12px;
+            padding: 22px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: var(--bg);
+        }
+        .rf-upload-zone:hover {
+            border-color: var(--nav-primary);
+            background: var(--nav-primary-light);
+        }
+        .rf-upload-icon {
+            font-size: 1.8rem;
+            color: var(--nav-primary);
+            display: block;
+            margin-bottom: 6px;
+        }
+        .rf-upload-title {
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+        .rf-upload-sub {
+            font-size: 0.74rem;
+            color: var(--text-light);
+        }
+        .rf-upload-types {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .rf-upload-type {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 0.7rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ── Submit button ── */
+        .rf-submit-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 2px;
+        }
+        .rf-submit-note {
+            font-size: 0.78rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .rf-submit-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--nav-primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .rf-submit-btn:hover {
+            background: var(--nav-primary-dark);
+        }
+
+        /* ── Success screen ── */
+        .rf-success {
+            display: none;
+            text-align: center;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px 28px;
+        }
+        .rf-success.show {
+            display: block;
+        }
+        .rf-success-icon {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background: #e8f5e9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--nav-green);
+            margin: 0 auto 16px;
+        }
+        .rf-success h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .rf-success p {
+            font-size: 0.88rem;
+            color: var(--text-light);
+            max-width: 420px;
+            margin: 0 auto 16px;
+            line-height: 1.5;
+        }
+        .rf-ref-badge {
+            display: inline-block;
+            background: var(--nav-primary-light);
+            color: var(--nav-primary);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+        .rf-success-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .rf-success-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.83rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s;
+        }
+        .rf-success-btn.primary {
+            background: var(--nav-primary);
+            color: white;
+        }
+        .rf-success-btn.primary:hover {
+            background: var(--nav-primary-dark);
+        }
+        .rf-success-btn.secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .rf-success-btn.secondary:hover {
+            border-color: var(--nav-primary);
+            color: var(--nav-primary);
+        }
+
+        /* ── Helper ── */
+        .rf-hint {
+            font-size: 0.72rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 2px;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+            body {
+                padding: 10px;
+            }
+            .rf-header {
+                padding: 12px 16px;
+                gap: 12px;
+                border-radius: 12px;
+            }
+            .rf-header-text h1 {
+                font-size: 1.05rem;
+            }
+            .rf-header-text p {
+                font-size: 0.7rem;
+            }
+            .rf-logo {
+                width: 36px;
+                height: 36px;
+                font-size: 1.1rem;
+            }
+            .rf-type-btn {
+                padding: 10px 10px;
+                gap: 8px;
+                flex-direction: column;
+                align-items: center;
+            }
+            .rf-type-label-group {
+                align-items: center;
+            }
+            .rf-type-sub {
+                display: none;
+            }
+            .rf-type-label {
+                font-size: 0.75rem;
+            }
+            .rf-type-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 1rem;
+            }
+            .rf-section {
+                padding: 14px 14px;
+            }
+            .rf-grid-2,
+            .rf-grid-3 {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px 14px;
+            }
+            .rf-urgency-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+            .rf-urgency-label {
+                padding: 10px 4px;
+            }
+            .rf-urgency-name {
+                font-size: 0.72rem;
+            }
+            .rf-urgency-desc {
+                font-size: 0.6rem;
+            }
+            .rf-submit-btn {
+                padding: 10px 18px;
+                font-size: 0.82rem;
+            }
+            .rf-success {
+                padding: 28px 16px;
+            }
+            .rf-success h2 {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .rf-grid-2,
+            .rf-grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .rf-type-btn {
+                flex-direction: row;
+                padding: 8px 10px;
+                gap: 10px;
+            }
+            .rf-type-label-group {
+                align-items: flex-start;
+            }
+            .rf-type-sub {
+                display: block;
+                font-size: 0.6rem;
+            }
+            .rf-type-label {
+                font-size: 0.72rem;
+            }
+            .rf-type-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="rf-container">
+
+        <!-- ── Header (compact) ── -->
+        <div class="rf-header">
+            <div class="rf-header-inner">
+                <div class="rf-logo"><i class="ti ti-route"></i></div>
+                <div class="rf-header-text">
+                    <h1>Patient Referral</h1>
+                    <p>Dr. Peter Odili Cancer &amp; Cardiovascular Centre</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Referral type toggle (compact) ── -->
+        <div class="rf-type-toggle">
+            <button class="rf-type-btn active" onclick="switchForm('gp', this)">
+                <div class="rf-type-icon"><i class="ti ti-building-clinic"></i></div>
+                <div class="rf-type-label-group">
+                    <span class="rf-type-label">GP / Hospital referral</span>
+                    <span class="rf-type-sub">For doctors &amp; hospitals</span>
+                </div>
+            </button>
+            <button class="rf-type-btn" onclick="switchForm('self', this)">
+                <div class="rf-type-icon"><i class="ti ti-user-heart"></i></div>
+                <div class="rf-type-label-group">
+                    <span class="rf-type-label">Self-referral</span>
+                    <span class="rf-type-sub">Book directly as a patient</span>
+                </div>
+            </button>
+        </div>
+
+        <!-- ══════════════ GP / HOSPITAL REFERRAL ══════════════ -->
+        <div id="form-gp" class="rf-form active">
+
+            <!-- Success screen -->
+            <div id="gp-success" class="rf-success">
+                <div class="rf-success-icon"><i class="ti ti-circle-check"></i></div>
+                <h2>Referral submitted successfully</h2>
+                <p>Thank you, Dr. <span id="gp-success-name">—</span>. The patient navigation team has been notified and will review this referral immediately. You will receive an email confirmation shortly.</p>
+                <div class="rf-ref-badge" id="gp-success-ref">REF-2026-00049</div>
+                <p style="font-size:0.8rem; color:var(--text-light);">The patient will receive a WhatsApp confirmation on the number provided.</p>
+                <div class="rf-success-actions">
+                    <button class="rf-success-btn primary" onclick="resetForm('gp')">Submit another referral</button>
+                    <button class="rf-success-btn secondary">Download confirmation</button>
+                </div>
+            </div>
+
+            <!-- Form fields -->
+            <div id="gp-fields">
+
+                <!-- Referring doctor -->
+                <div class="rf-section">
+                    <div class="rf-section-title"><i class="ti ti-user-md"></i> Referring doctor details</div>
+                    <div class="rf-grid-2">
+                        <div class="rf-field">
+                            <label>Doctor's full name <span class="rf-required">*</span></label>
+                            <input type="text" placeholder="Dr. Emeka Okafor" />
+                        </div>
+                        <div class="rf-field">
+                            <label>Hospital / clinic <span class="rf-required">*</span></label>
+                            <input type="text" placeholder="St. Theresa's Hospital, Enugu" />
+                        </div>
+                        <div class="rf-field">
+                            <label>Phone number <span class="rf-required">*</span></label>
+                            <input type="tel" placeholder="+234 803 000 0000" />
+                        </div>
+                        <div class="rf-field">
+                            <label>Email address <span class="rf-required">*</span></label>
+                            <input type="email" placeholder="doctor@hospital.com" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Patient information -->
+                <div class="rf-section">
+                    <div class="rf-section-title"><i class="ti ti-user-circle"></i> Patient information</div>
+                    <div class="rf-grid-3">
+                        <div class="rf-field full">
+                            <label>Patient full name <span class="rf-required">*</span></label>
+                            <input type="text" placeholder="Ngozi Eze" />
+                        </div>
+                        <div class="rf-field">
+                            <label>Age <span class="rf-required">*</span></label>
+                            <input type="number" placeholder="48" min="0" max="130" />
+                        </div>
+                        <div class="rf-field">
+                            <label>Sex <span class="rf-required">*</span></label>
+                            <select>
+                                <option value="">Select</option>
+                                <option>Female</option>
+                                <option>Male</option>
+                            </select>
+                        </div>
+                        <div class="rf-field">
+                            <label>State / location <span class="rf-required">*</span></label>
+                            <input type="text" placeholder="Enugu, Nigeria" />
+                        </div>
+                        <div class="rf-field">
+                            <label>Patient phone / WhatsApp <span class="rf-required">*</span></label>
+                            <input type="tel" placeholder="+234 803 456 7890" />
+                        </div>
+                        <div class="rf-field">
+                            <label>Patient email <span class="rf-optional">(optional)</span></label>
+                            <input type="email" placeholder="patient@email.com" />
+                        </div>
+                    </div>
+
+                    <div style="margin-top:14px; display:flex; flex-direction:column; gap:8px;">
+                        <label class="rf-check-row" id="gp-accom-row">
+                            <input type="checkbox" id="gp-accom" onchange="toggleCompanions('gp')" />
+                            <div>
+                                <div class="rf-check-label">Patient will need accommodation</div>
+                                <div class="rf-check-sub">Travelling from outside Port Harcourt</div>
+                            </div>
+                        </label>
+                        <div class="rf-companions" id="gp-companions">
+                            <div class="rf-field">
+                                <label>Number of accompanying people</label>
+                                <input type="number" placeholder="0" min="0" max="10" style="max-width:140px" />
+                                <span class="rf-hint"><i class="ti ti-info-circle" style="font-size:12px"></i> Include family members travelling with the patient</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clinical details -->
+                <div class="rf-section">
+                    <div class="rf-section-title"><i class="ti ti-activity"></i> Clinical details</div>
+                    <div class="rf-grid-2">
+                        <div class="rf-field">
+                            <label>Diagnosis / condition <span class="rf-required">*</span></label>
+                            <input type="text" placeholder="Breast cancer — Stage II" />
+                        </div>
+                        <div class="rf-field">
+                            <label>Specialty required <span class="rf-required">*</span></label>
+                            <select>
+                                <option value="">Select specialty</option>
+                                <option>Oncology</option>
+                                <option>Cardiology</option>
+                                <option>Radiology</option>
+                                <option>General surgery</option>
+                                <option>Internal medicine</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="rf-field full">
+                            <label>Doctor's notes <span class="rf-optional">(optional)</span></label>
+                            <textarea placeholder="Brief clinical summary, history, and reason for referral…"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Urgency selector -->
+                    <div style="margin-top:16px;">
+                        <label style="display:block; margin-bottom:10px;">Urgency level <span class="rf-required">*</span></label>
+                        <div class="rf-urgency-grid">
+
+                            <div class="rf-u-routine">
+                                <input type="radio" name="gp-urgency" id="gp-routine" value="routine" class="rf-urgency-opt" checked />
+                                <label for="gp-routine" class="rf-urgency-label">
+                                    <div class="rf-urgency-dot"></div>
+                                    <div class="rf-urgency-name">Routine</div>
+                                    <div class="rf-urgency-desc">No immediate risk</div>
+                                </label>
+                            </div>
+
+                            <div class="rf-u-soon">
+                                <input type="radio" name="gp-urgency" id="gp-soon" value="soon" class="rf-urgency-opt" />
+                                <label for="gp-soon" class="rf-urgency-label">
+                                    <div class="rf-urgency-dot"></div>
+                                    <div class="rf-urgency-name">Soon</div>
+                                    <div class="rf-urgency-desc">Within 1–2 weeks</div>
+                                </label>
+                            </div>
+
+                            <div class="rf-u-urgent">
+                                <input type="radio" name="gp-urgency" id="gp-urgent" value="urgent" class="rf-urgency-opt" />
+                                <label for="gp-urgent" class="rf-urgency-label">
+                                    <div class="rf-urgency-dot"></div>
+                                    <div class="rf-urgency-name">Urgent</div>
+                                    <div class="rf-urgency-desc">Within 48–72 hours</div>
+                                </label>
+                            </div>
+
+                            <div class="rf-u-emergency">
+                                <input type="radio" name="gp-urgency" id="gp-emergency" value="emergency" class="rf-urgency-opt" />
+                                <label for="gp-emergency" class="rf-urgency-label">
+                                    <div class="rf-urgency-dot"></div>
+                                    <div class="rf-urgency-name">Emergency</div>
+                                    <div class="rf-urgency-desc">Immediate attention</div>
+                                </label>
+                            </div>
+
+                        </div>
+                        <div class="rf-emergency-notice" id="gp-emergency-notice">
+                            <i class="ti ti-alert-triangle" style="font-size:15px; flex-shrink:0;"></i>
+                            Emergency referrals trigger an immediate alert to the senior navigator and on-call clinician.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Document upload -->
+                <div class="rf-section">
+                    <div class="rf-section-title"><i class="ti ti-upload"></i> Document upload <span style="font-weight:400; text-transform:none; letter-spacing:0; color:var(--text-light); font-size:0.75rem;">(optional but recommended)</span></div>
+                    <div class="rf-upload-zone" onclick="document.getElementById('gp-file-input').click()">
+                        <i class="ti ti-cloud-upload rf-upload-icon"></i>
+                        <div class="rf-upload-title">Drag and drop files here, or click to browse</div>
+                        <div class="rf-upload-sub">Referral letters, test results, imaging, prescriptions</div>
+                        <div class="rf-upload-types">
+                            <span class="rf-upload-type"><i class="ti ti-file-type-pdf" style="font-size:12px; color:var(--nav-danger)"></i> PDF</span>
+                            <span class="rf-upload-type"><i class="ti ti-photo" style="font-size:12px; color:var(--nav-green)"></i> JPG / PNG</span>
+                            <span class="rf-upload-type"><i class="ti ti-file" style="font-size:12px; color:var(--nav-primary)"></i> DOC</span>
+                            <span class="rf-upload-type">Max 10 MB</span>
+                        </div>
+                    </div>
+                    <input type="file" id="gp-file-input" multiple style="display:none" />
+                </div>
+
+                <!-- Submit -->
+                <div class="rf-section">
+                    <div class="rf-submit-row">
+                        <div class="rf-submit-note">
+                            <i class="ti ti-lock" style="font-size:14px; color:var(--nav-green)"></i>
+                            Encrypted &amp; confidential
+                        </div>
+                        <button class="rf-submit-btn" onclick="submitForm('gp')">
+                            <i class="ti ti-send"></i> Submit referral
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ══════════════ SELF-REFERRAL ══════════════ -->
+        <div id="form-self" class="rf-form">
+
+            <!-- Success screen -->
+            <div id="self-success" class="rf-success">
+                <div class="rf-success-icon"><i class="ti ti-circle-check"></i></div>
+                <h2>Booking received</h2>
+                <p>Thank you, <span id="self-success-name">—</span>. Our patient navigation team has received your request and will contact you on the WhatsApp number you provided within 24 hours.</p>
+                <div class="rf-ref-badge" id="self-success-ref">REF-2026-00050</div>
+                <p style="font-size:0.8rem; color:var(--text-light);">Keep your reference number safe — you may need it when our navigator calls you.</p>
+                <div class="rf-success-actions">
+                    <button class="rf-success-btn primary" onclick="resetForm('self')">Submit another booking</button>
+                    <button class="rf-success-btn secondary">Download confirmation</button>
+                </div>
+            </div>
+
+            <!-- Form fields -->
+            <div id="self-fields">
+
+                <!-- Patient details -->
+                <div class="rf-section">
+                    <div class="rf-section-title"><i class="ti ti-user-circle"></i> Your details</div>
+                    <div class="rf-grid-3">
+                        <div class="rf-field full">
+                            <label>Full name <span class="rf-required">*</span></label>
+                            <input type="text" placeholder="Ngozi Eze" />
+                        </div>
+                        <div class="rf-field">
+                            <label>Date of birth <span class="rf-required">*</span></label>
+                            <input type="date" />
+                        </div>
+                        <div class="rf-field">
+                            <label>Sex <span class="rf-required">*</span></label>
+                            <select>
+                                <option value="">Select</option>
+                                <option>Female</option>
+                                <option>Male</option>
+                            </select>
+                        </div>
+                        <div class="rf-field">
+                            <label>Phone / WhatsApp <span class="rf-required">*</span></label>
+                            <input type="tel" placeholder="+234 803 456 7890" />
+                            <span class="rf-hint"><i class="ti ti-brand-whatsapp" style="font-size:12px; color:var(--nav-green)"></i> We'll send your confirmation here</span>
+                        </div>
+                        <div class="rf-field">
+                            <label>Email address <span class="rf-optional">(optional)</span></label>
+                            <input type="email" placeholder="you@email.com" />
+                        </div>
+                        <div class="rf-field">
+                            <label>State <span class="rf-required">*</span></label>
+                            <select>
+                                <option value="">Select state</option>
+                                <option>Abia</option><option>Adamawa</option><option>Akwa Ibom</option>
+                                <option>Anambra</option><option>Bauchi</option><option>Bayelsa</option>
+                                <option>Benue</option><option>Borno</option><option>Cross River</option>
+                                <option>Delta</option><option>Ebonyi</option><option>Edo</option>
+                                <option>Ekiti</option><option>Enugu</option><option>FCT</option>
+                                <option>Gombe</option><option>Imo</option><option>Jigawa</option>
+                                <option>Kaduna</option><option>Kano</option><option>Katsina</option>
+                                <option>Kebbi</option><option>Kogi</option><option>Kwara</option>
+                                <option>Lagos</option><option>Nasarawa</option><option>Niger</option>
+                                <option>Ogun</option><option>Ondo</option><option>Osun</option>
+                                <option>Oyo</option><option>Plateau</option><option>Rivers</option>
+                                <option>Sokoto</option><option>Taraba</option><option>Yobe</option>
+                                <option>Zamfara</option>
+                            </select>
+                        </div>
+                        <div class="rf-field">
+                            <label>Country <span class="rf-required">*</span></label>
+                            <select>
+                                <option value="nigeria" selected>Nigeria</option>
+                                <option>Ghana</option><option>UK</option>
+                                <option>USA</option><option>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Family contact -->
+                <div class="rf-section">
+                    <div class="rf-section-title"><i class="ti ti-users"></i> Family contact <span style="font-weight:400; text-transform:none; letter-spacing:0; color:var(--text-light); font-size:0.75rem;">(optional)</span></div>
+                    <p style="font-size:0.8rem; color:var(--text-light); margin-bottom:14px; line-height:1.5;">
+                        For elderly or seriously ill patients, a family member can receive appointment confirmations and reminders on your behalf.
+                    </p>
+                    <div class="rf-grid-2">
+                        <div class="rf-field">
+                            <label>Family member's name</label>
+                            <input type="text" placeholder="Chidi Eze" />
+                        </div>
+                        <div class="rf-field">
+                            <label>Family member's phone / WhatsApp</label>
+                            <input type="tel" placeholder="+234 806 123 4567" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Symptoms and specialty -->
+                <div class="rf-section">
+                    <div class="rf-section-title"><i class="ti ti-heart-rate-monitor"></i> Symptoms &amp; specialty</div>
+                    <div class="rf-grid-2">
+                        <div class="rf-field full">
+                            <label>Describe your symptoms <span class="rf-required">*</span></label>
+                            <textarea placeholder="Please describe what you are experiencing — when it started, how severe it is, and any changes over time…"></textarea>
+                        </div>
+                        <div class="rf-field">
+                            <label>Specialty <span class="rf-optional">(if known)</span></label>
+                            <select>
+                                <option value="">I'm not sure</option>
+                                <option>Oncology</option>
+                                <option>Cardiology</option>
+                                <option>Radiology</option>
+                                <option>General surgery</option>
+                                <option>Internal medicine</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="rf-field">
+                            <label>Do you have a referral letter?</label>
+                            <select>
+                                <option value="">Select</option>
+                                <option>Yes — I will upload it</option>
+                                <option>Yes — I will bring it in person</option>
+                                <option>No referral letter</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Travel & accommodation -->
+                <div class="rf-section">
+                    <div class="rf-section-title"><i class="ti ti-map-pin"></i> Travel &amp; accommodation</div>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <label class="rf-check-row">
+                            <input type="checkbox" id="self-accom" onchange="toggleCompanions('self')" />
+                            <div>
+                                <div class="rf-check-label">I will need accommodation</div>
+                                <div class="rf-check-sub">Travelling from outside Port Harcourt — our team will assist</div>
+                            </div>
+                        </label>
+                        <div class="rf-companions" id="self-companions">
+                            <div class="rf-field">
+                                <label>Number of people travelling with you</label>
+                                <input type="number" placeholder="0" min="0" max="10" style="max-width:140px" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Document upload -->
+                <div class="rf-section">
+                    <div class="rf-section-title"><i class="ti ti-upload"></i> Document upload <span style="font-weight:400; text-transform:none; letter-spacing:0; color:var(--text-light); font-size:0.75rem;">(optional)</span></div>
+                    <p style="font-size:0.8rem; color:var(--text-light); margin-bottom:14px; line-height:1.5;">
+                        Upload any existing test results, referral letters, or medical records. This helps our team prepare before your first visit.
+                    </p>
+                    <div class="rf-upload-zone" onclick="document.getElementById('self-file-input').click()">
+                        <i class="ti ti-cloud-upload rf-upload-icon"></i>
+                        <div class="rf-upload-title">Drag and drop files here, or click to browse</div>
+                        <div class="rf-upload-sub">Test results, referral letters, scan reports — any existing documents</div>
+                        <div class="rf-upload-types">
+                            <span class="rf-upload-type"><i class="ti ti-file-type-pdf" style="font-size:12px; color:var(--nav-danger)"></i> PDF</span>
+                            <span class="rf-upload-type"><i class="ti ti-photo" style="font-size:12px; color:var(--nav-green)"></i> JPG / PNG</span>
+                            <span class="rf-upload-type">Max 10 MB</span>
+                        </div>
+                    </div>
+                    <input type="file" id="self-file-input" multiple style="display:none" />
+                </div>
+
+                <!-- Submit -->
+                <div class="rf-section">
+                    <div class="rf-submit-row">
+                        <div class="rf-submit-note">
+                            <i class="ti ti-lock" style="font-size:14px; color:var(--nav-green)"></i>
+                            Private &amp; secure
+                        </div>
+                        <button class="rf-submit-btn" onclick="submitForm('self')">
+                            <i class="ti ti-send"></i> Submit booking
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchForm(type, btn) {
+            document.querySelectorAll('.rf-type-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.rf-form').forEach(f => f.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('form-' + type).classList.add('active');
+        }
+
+        function toggleCompanions(prefix) {
+            const cb = document.getElementById(prefix + '-accom');
+            const companions = document.getElementById(prefix + '-companions');
+            companions.classList.toggle('show', cb.checked);
+        }
+
+        // Emergency notice handler for GP form
+        document.querySelectorAll('input[name="gp-urgency"]').forEach(r => {
+            r.addEventListener('change', function() {
+                const notice = document.getElementById('gp-emergency-notice');
+                notice.classList.toggle('show', this.value === 'emergency');
+            });
+        });
+
+        function submitForm(type) {
+            const ref = 'REF-2026-' + String(Math.floor(Math.random() * 900) + 100).padStart(5, '0');
+
+            if (type === 'gp') {
+                document.getElementById('gp-success-ref').textContent = ref;
+                document.getElementById('gp-success-name').textContent = 'Doctor';
+                document.getElementById('gp-fields').style.display = 'none';
+                document.getElementById('gp-success').classList.add('show');
+            } else {
+                document.getElementById('self-success-ref').textContent = ref;
+                document.getElementById('self-success-name').textContent = 'there';
+                document.getElementById('self-fields').style.display = 'none';
+                document.getElementById('self-success').classList.add('show');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetForm(type) {
+            if (type === 'gp') {
+                document.getElementById('gp-fields').style.display = '';
+                document.getElementById('gp-success').classList.remove('show');
+                // Reset emergency notice
+                document.getElementById('gp-emergency-notice').classList.remove('show');
+            } else {
+                document.getElementById('self-fields').style.display = '';
+                document.getElementById('self-success').classList.remove('show');
+            }
+        }
+    </script>
+
+</body>
+</html>
