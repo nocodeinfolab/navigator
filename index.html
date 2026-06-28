@@ -259,9 +259,63 @@
   }
 
   @media (max-width: 600px) {
-    .pnp-header-inner { flex-direction: column; gap: 16px; }
-    .pnp-user-chip { width: 100%; justify-content: center; }
-    .pnp-role-grid { grid-template-columns: 1fr; }
+      .pnp-header {
+          padding: 18px 20px;
+          border-radius: 12px;
+      }
+  
+      .pnp-header-inner {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+      }
+  
+      .pnp-brand {
+          gap: 10px;
+          min-width: 0;
+          flex: 1;
+      }
+  
+      .pnp-logo-box {
+          width: 42px;
+          height: 42px;
+          border-radius: 10px;
+          font-size: 1.2rem;
+          flex-shrink: 0;
+      }
+  
+      .pnp-brand-text h1 {
+          font-size: 1.1rem;
+          margin-bottom: 2px;
+      }
+  
+      .pnp-brand-text p {
+          font-size: 0.72rem;
+          line-height: 1.3;
+      }
+  
+      .pnp-user-chip {
+          padding: 6px 10px;
+          gap: 8px;
+          width: auto;
+          flex-shrink: 0;
+      }
+  
+      .pnp-avatar {
+          width: 32px;
+          height: 32px;
+          font-size: 0.9rem;
+      }
+  
+      .pnp-user-name {
+          font-size: 0.8rem;
+      }
+  
+      .pnp-user-role {
+          font-size: 0.68rem;
+      }
   }
 </style>
 
